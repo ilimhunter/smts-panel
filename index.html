@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sosyal Medya Paylaşım Takip Sistemi (Google Sheets)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .modal-content-animated { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        input[type="checkbox"] { transform: scale(1.2); accent-color: #2563EB; }
+        .shared-row { background-color: #A7F3D0 !important; color: #065F46 !important; }
+        .shared-kpi { background-color: #D1FAE5; color: #065F46; }
+        .upcoming-kpi { background-color: #BFDBFE; color: #1E40AF; }
+        .filtered-kpi { background-color: #FEEBC7; color: #C05621; }
+        .social-media-yes { background-color: #A7F3D0 !important; color: #065F46 !important; }
+        .social-media-maybe { background-color: #FDE68A !important; color: #92400E !important; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased leading-relaxed">
+    <div class="container mx-auto p-6 md:p-10 lg:p-12">
+        <div class="bg-white rounded-3xl shadow-xl p-6 md:p-10">
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-center text-gray-700 mb-8">Sosyal Medya Paylaşım Takip Sistemi</h1>
+
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="document.getElementById('xlsxInput').click()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 01-1.414-1.414L11 9.586V7z" clip-rule="evenodd" />
+                    </svg>
+                    .xlsx Yükle
+                </button>
+                <button onclick="exportToXLSX()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 11.586V4a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    .xlsx İndir
+                </button>
+                <button onclick="showNewRecordForm()" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Yeni Kayıt
+                </button>
+                <button onclick="clearData()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                    Temizle (Bulut + Önbellek)
+                </button>
+            </div>
+            <input type="file" id="xlsxInput" accept=".xlsx" class="hidden" onchange="handleFile(this.files)">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-8">
+                <div id="totalStat" onclick="filterByShareStatus('all')" class="bg-indigo-200 hover:bg-indigo-300 text-indigo-800 font-bold p-6 rounded-2xl shadow-md transition-all duration-300 cursor-pointer transform hover:scale-105 flex justify-between items-center">
+                    <span class="text-lg">Toplam Kayıt</span>
+                    <span id="totalCount" class="text-3xl md:text-4xl">0</span>
+                </div>
+                <div id="sharedStat" onclick="filterByShareStatus('shared')" class="shared-kpi hover:bg-green-300 font-bold p-6 rounded-2xl shadow-md transition-all duration-300 cursor-pointer transform hover:scale-105 flex justify-between items-center">
+                    <span class="text-lg">Paylaşılan</span>
+                    <span id="sharedCount" class="text-3xl md:text-4xl">0</span>
+                </div>
+                <div id="unsharedStat" onclick="filterByShareStatus('unshared')" class="bg-pink-200 hover:bg-pink-300 text-pink-800 font-bold p-6 rounded-2xl shadow-md transition-all duration-300 cursor-pointer transform hover:scale-105 flex justify-between items-center">
+                    <span class="text-lg">Paylaşılmayan</span>
+                    <span id="unsharedCount" class="text-3xl md:text-4xl">0</span>
+                </div>
+                <div id="upcomingStat" onclick="filterByUpcoming()" class="upcoming-kpi hover:bg-blue-300 font-bold p-6 rounded-2xl shadow-md transition-all duration-300 cursor-pointer transform hover:scale-105 flex justify-between items-center">
+                    <span class="text-lg">Yaklaşan Paylaşımlar</span>
+                    <span id="upcomingCount" class="text-3xl md:text-4xl">0</span>
+                </div>
+                <div id="filteredStat" onclick="filterByCurrent()" class="filtered-kpi hover:bg-orange-300 font-bold p-6 rounded-2xl shadow-md transition-all duration-300 cursor-pointer transform hover:scale-105 flex justify-between items-center">
+                    <span class="text-lg">Filtrelenen Satır</span>
+                    <span id="filteredCount" class="text-3xl md:text-4xl">0</span>
+                </div>
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-700 mb-4 text-center">Filtrele</h3>
+            <div class="bg-blue-100 p-6 rounded-xl shadow-inner mb-4">
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div>
+                        <label for="routineFilter" class="block text-sm font-medium text-blue-800">Paylaşım Rutini</label>
+                        <select id="routineFilter" onchange="applyFilters()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="">Tümü</option>
+                            <option value="Spontane">Spontane</option>
+                            <option value="Aylık">Aylık</option>
+                            <option value="Yıllık">Yıllık</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="socialMediaFilter" class="block text-sm font-medium text-blue-800">Sosyal Medyada Paylaşılacak mı?</label>
+                        <select id="socialMediaFilter" onchange="applyFilters()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="">Tümü</option>
+                            <option value="Evet">Evet</option>
+                            <option value="Hayır">Hayır</option>
+                            <option value="Belki">Belki</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="institutionFilter" class="block text-sm font-medium text-blue-800">Kurum Filtresi</label>
+                        <select id="institutionFilter" onchange="applyFilters()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="">Tümü</option>
+                            <option>AİLE VE SOSYAL POLİTİKALAR BAKANLIĞI</option>
+                            <option>ÇALIŞMA VE SOSYAL GÜVENLİK BAKANLIĞI</option>
+                            <option>ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ</option>
+                            <option>ENERJİ VE TABİİ KAYNAKLARI BAKANLIĞI</option>
+                            <option>GENÇLİK VE SPOR BAKANLIĞI</option>
+                            <option>İÇİŞLERİ BAKANLIĞI</option>
+                            <option>KÜLTÜR VE TURİZM BAKANLIĞI</option>
+                            <option>MALİYE BAKANLIĞI</option>
+                            <option>MİLLİ EĞİTİM BAKANLIĞI</option>
+                            <option>SAĞLIK BAKANLIĞI</option>
+                            <option>SANAYİ VE TEKNOLOJİ BAKANLIĞI</option>
+                            <option>TARIM VE ORMAN BAKANLIĞI</option>
+                            <option>TİCARET BAKANLIĞI</option>
+                            <option>TUİK</option>
+                            <option>ULAŞTIRMA VE ALTYAPI BAKANLIĞI</option>
+                            <option>YÖK</option>
+                            <option>DİYANET İŞLERİ BAŞKANLIĞI</option>
+                            <option>İSTANBUL PROJE KOORDİNASYON BİRİMİ (İPKB)</option>
+                            <option>PROJELER</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sectorFilter" class="block text-sm font-medium text-blue-800">Sektör Filtresi</label>
+                        <select id="sectorFilter" onchange="applyFilters()" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                            <option value="">Tümü</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-200 p-6 rounded-xl shadow-inner mb-8">
+                <div class="flex flex-wrap items-center justify-center gap-6">
+                    <div>
+                        <label for="similarShareFilter" class="flex items-center space-x-2 text-sm font-medium text-gray-800">
+                            <input type="checkbox" id="similarShareFilter" onchange="applyFilters()">
+                            <span>Bakanlık Paylaşımı Olanlar</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="webSourceFilter" class="flex items-center space-x-2 text-sm font-medium text-gray-800">
+                            <input type="checkbox" id="webSourceFilter" onchange="applyFilters()">
+                            <span>Kaynak Web Adresi Olanlar</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="almanacFilter" class="flex items-center space-x-2 text-sm font-medium text-gray-800">
+                            <input type="checkbox" id="almanacFilter" onchange="applyFilters()">
+                            <span>Belirli bir günü ve haftası var mı</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="tuikFilter" class="flex items-center space-x-2 text-sm font-medium text-gray-800">
+                            <input type="checkbox" id="tuikFilter" onchange="applyFilters()">
+                            <span>TUİK'te yer alanlar</span>
+                        </label>
+                    </div>
+                    <button onclick="clearFilters()" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded-full transition-colors duration-300">
+                        Filtreleri Temizle
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
+                <h3 class="text-lg font-semibold text-gray-600 mb-4 text-center">Görünür Sütunlar</h3>
+                <div id="columnCheckboxes" class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-600"></div>
+            </div>
+
+            <div id="dropZone" class="border-2 border-dashed border-gray-400 rounded-xl p-6 text-center text-gray-500 mb-8 transition-colors duration-300 hover:bg-gray-50">
+                Dosyanızı buraya sürükleyip bırakın (.xlsx)
+            </div>
+
+            <div class="overflow-x-auto rounded-xl shadow-md">
+                <table id="dataTable" class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200 sticky top-0 border-2 border-gray-400">
+                        <tr id="tableHeadRow">
+                            <th class="py-3 px-6 border-r-2 border-gray-400"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                            <!-- Dinamik başlıklar eklenecek -->
+                            <th class="py-3 px-6">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="bg-white divide-y-2 divide-gray-300"></tbody>
+                </table>
+            </div>
+
+            <div id="newRecordModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                <div class="relative top-20 mx-auto p-8 rounded-xl bg-white shadow-2xl w-11/12 md:max-w-xl lg:max-w-2xl modal-content-animated">
+                    <span class="close-btn text-gray-500 hover:text-gray-700 text-3xl font-bold absolute top-4 right-6 cursor-pointer" onclick="closeNewRecordModal()">&times;</span>
+                    <h2 class="text-2xl font-bold text-gray-700 mb-6 text-center">Yeni Kayıt Ekle/Düzenle</h2>
+                    <form id="recordForm">
+                        <input type="hidden" name="id" />
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="formFields"></div>
+                        <div class="flex justify-end mt-6 space-x-4">
+                            <button type="button" onclick="closeNewRecordModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-full transition-colors duration-300">İptal</button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">Kaydet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <p class="text-center text-sm text-gray-500 mt-8 mb-2">
+                Veriler bulutta (Google Sheets) saklanır. Cihazınızda son görüntülenen hali de önbelleğe alınır.
+            </p>
+            <p class="text-center text-xs text-gray-400">&copy; Made By B. A.</p>
+        </div>
+    </div>
+
+<script>
+// ======= AYARLAR =======
+const BACKEND_URL = const BACKEND_URL = "https://script.google.com/macros/s/…/exec";"; // Google Apps Script Web App URL
+// Google Sheet başlıkları (ilk satır) – mevcut tablo düzeninle uyumlu
+const SHEET_COLUMNS = [
+  'id',
+  'Kurum','Alt Kurum','Sektör','Paylaşım Konusu','Paylaşım Tarihi',
+  'Belirli bir günü ve haftası var mı?','İrtibat Kişisinin Ünvanı','İrtibat Kişisinin Adı Soyadı',
+  'Paylaştığımız Gönderinin Bağlantı Adresi','Açıklama','Almanakta yer alan belirli gün ve hafta ismi',
+  'Bakanlığın Paylaşım Metni',"TUİK'te var mı?","TUİK'te yayımlanma takvimi",
+  'Paylaşım Rutini','Sosyal Medyada Paylaşılacak mı?','Kaynak','Kaynak İnternet Adresi',
+  'Bakanlık Sosyal Medya Paylaşımı Var mı?','Paylaşıldı'
+];
+
+// Varsayılan görünürlük
+const allColumns = {
+  'Kurum': true,
+  'Alt Kurum': false,
+  'Sektör': false,
+  'Paylaşım Konusu': true,
+  'Paylaşım Tarihi': true,
+  'Belirli bir günü ve haftası var mı?': false,
+  'İrtibat Kişisinin Ünvanı': false,
+  'İrtibat Kişisinin Adı Soyadı': false,
+  'Paylaştığımız Gönderinin Bağlantı Adresi': false,
+  'Açıklama': true,
+  'Almanakta yer alan belirli gün ve hafta ismi': false,
+  'Bakanlığın Paylaşım Metni': false,
+  "TUİK'te var mı?": false,
+  "TUİK'te yayımlanma takvimi": false,
+  "Paylaşım Rutini": false,
+  "Sosyal Medyada Paylaşılacak mı?": false,
+  "Kaynak": false,
+  "Kaynak İnternet Adresi": false,
+  "Bakanlık Sosyal Medya Paylaşımı Var mı?": false,
+  'Paylaşıldı': false
+};
+
+const institutions = ["AİLE VE SOSYAL POLİTİKALAR BAKANLIĞI","ÇALIŞMA VE SOSYAL GÜVENLİK BAKANLIĞI","ÇEVRE, ŞEHİRCİLİK VE İKLİM DEĞİŞİKLİĞİ","ENERJİ VE TABİİ KAYNAKLARI BAKANLIĞI","GENÇLİK VE SPOR BAKANLIĞI","İÇİŞLERİ BAKANLIĞI","KÜLTÜR VE TURİZM BAKANLIĞI","MALİYE BAKANLIĞI","MİLLİ EĞİTİM BAKANLIĞI","SAĞLIK BAKANLIĞI","SANAYİ VE TEKNOLOJİ BAKANLIĞI","TARIM VE ORMAN BAKANLIĞI","TİCARET BAKANLIĞI","TUİK","ULAŞTIRMA VE ALTYAPI BAKANLIĞI","YÖK","DİYANET İŞLERİ BAŞKANLIĞI","İSTANBUL PROJE KOORDİNASYON BİRİMİ (İPKB)","PROJELER"];
+
+// ======= DURUMLAR =======
+let data = [];          // Buluttan gelen veri
+let filteredData = [];  // Filtrelenmiş görünüm
+let editIndex = null;
+let currentShareFilter = 'all';
+
+// ======= YARDIMCI =======
+function uid() { return 'id-' + Math.random().toString(36).slice(2) + Date.now(); }
+function formatColumnName(col) {
+  if (col === 'Paylaşım Konusu') return 'Konu';
+  if (col === 'Paylaştığımız Gönderinin Bağlantı Adresi') return 'Paylaşım Adresi';
+  if (col === 'Almanakta yer alan belirli gün ve hafta ismi') return 'Almanak Adı';
+  if (col === 'Bakanlığın Paylaşım Metni') return 'Bakanlık Metni';
+  if (col === 'TUİK\\'te yayımlanma takvimi') return 'TUİK Takvimi';
+  if (col === 'Paylaşıldı') return 'Paylaşıldı ✔';
+  if (col === 'Kaynak İnternet Adresi') return 'Kaynak Web Adresi';
+  if (col === 'Bakanlık Sosyal Medya Paylaşımı Var mı?') return 'Bakanlık Paylaşımı Var mı?';
+  return col;
+}
+
+// ======= BACKEND =======
+async function backend(action, payload={}){
+  const res = await fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, ...payload })
+  });
+  if (!res.ok) throw new Error('Ağ hatası');
+  return await res.json();
+}
+
+async function loadFromCloud(){
+  const cached = localStorage.getItem('shareData_cache');
+  if (cached) {
+    try { data = JSON.parse(cached); filteredData = [...data]; updateAfterDataChange(); } catch(e){}
+  }
+  const result = await backend('list');
+  data = result.rows || [];
+  filteredData = [...data];
+  localStorage.setItem('shareData_cache', JSON.stringify(data));
+  updateAfterDataChange();
+}
+
+async function createOnCloud(record){
+  record.id = record.id || uid();
+  await backend('create', { record });
+}
+
+async function updateOnCloud(record){
+  if (!record.id) throw new Error('Kayıt id bulunamadı');
+  await backend('update', { record });
+}
+
+async function deleteOnCloud(id){
+  await backend('delete', { id });
+}
+
+async function clearCloud(){
+  await backend('clear');
+}
+
+// ======= EXCEL İÇE/DIŞA AKTARIM =======
+function handleFile(files) {
+  const file = files[0];
+  if (file && file.name.endsWith('.xlsx')) {
+      const reader = new FileReader();
+      reader.onload = async function (e) {
+          const workbook = XLSX.read(e.target.result, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(sheet);
+          const toUpload = jsonData.map(row => {
+              const newRow = { ...row };
+              if (!newRow.id) newRow.id = uid();
+              // Tarih dönüştürme
+              if (newRow['Paylaşım Tarihi'] && typeof newRow['Paylaşım Tarihi'] === 'number') {
+                  newRow['Paylaşım Tarihi'] = new Date(Date.UTC(0, 0, newRow['Paylaşım Tarihi'] - 1)).toISOString().slice(0, 10);
+              }
+              if (!newRow['Sosyal Medyada Paylaşılacak mı?']) newRow['Sosyal Medyada Paylaşılacak mı?'] = 'Hayır';
+              newRow['Paylaşıldı'] = newRow['Paylaşıldı'] === '✔' || newRow['Paylaşıldı'] === true;
+              return newRow;
+          });
+          // Hepsini temizleyip yeniden yüklemek isterseniz:
+          await clearCloud();
+          for (const rec of toUpload) { await createOnCloud(rec); }
+          await loadFromCloud();
+      };
+      reader.readAsBinaryString(file);
+  }
+}
+
+function exportToXLSX() {
+  const ws = XLSX.utils.json_to_sheet(filteredData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Paylaşım Paneli');
+  XLSX.writeFile(wb, 'paylasim_paneli.xlsx');
+}
+
+// ======= TABLO =======
+function updateAfterDataChange(){
+  updateSectorFilter();
+  applyFilters();
+  updateColumnCheckboxes();
+}
+
+function updateTable() {
+  const tableBody = document.getElementById('tableBody');
+  const headRow = document.getElementById('tableHeadRow');
+
+  // Başlıkları kur
+  headRow.innerHTML = `<th class="py-3 px-6 border-r-2 border-gray-400"><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>`;
+  const visible = Object.keys(allColumns).filter(c => allColumns[c]);
+  const hidden = Object.keys(allColumns).filter(c => !allColumns[c]);
+  for (const col of visible) {
+    const th = document.createElement('th');
+    th.className = "py-3 px-6 border-r-2 border-gray-400";
+    th.dataset.column = col;
+    th.textContent = formatColumnName(col);
+    headRow.appendChild(th);
+  }
+  for (const col of hidden) {
+    const th = document.createElement('th');
+    th.className = "py-3 px-6 hidden border-r-2 border-gray-400";
+    th.dataset.column = col;
+    th.textContent = formatColumnName(col);
+    headRow.appendChild(th);
+  }
+  const actionsTh = document.createElement('th');
+  actionsTh.className = "py-3 px-6";
+  actionsTh.textContent = "İşlemler";
+  headRow.appendChild(actionsTh);
+
+  // Satırlar
+  tableBody.innerHTML = '';
+  filteredData.forEach((row, index) => {
+    const tr = document.createElement('tr');
+    tr.classList.add('bg-white','border-b-2','border-gray-300','hover:bg-gray-50','transition-colors','duration-200');
+    if (row['Sosyal Medyada Paylaşılacak mı?'] === 'Evet') tr.classList.add('social-media-yes');
+    else if (row['Sosyal Medyada Paylaşılacak mı?'] === 'Belki') tr.classList.add('social-media-maybe');
+
+    const selectTd = document.createElement('td');
+    selectTd.className = "py-4 px-6 border-r-2 border-gray-300";
+    selectTd.innerHTML = `<input type="checkbox" class="rowCheckbox" data-index="${index}">`;
+    tr.appendChild(selectTd);
+
+    for (const col of Object.keys(allColumns)) {
+      const td = document.createElement('td');
+      td.className = "py-4 px-6 border-r-2 border-gray-300";
+      if (!allColumns[col]) td.classList.add('hidden');
+      let cell = row[col] || '';
+      if (col === 'Paylaşım Tarihi' && cell) {
+        try { cell = new Date(cell).toLocaleDateString('tr-TR', {year:'numeric', month:'2-digit', day:'2-digit'}); } catch(e){}
+      }
+      if (col === 'Paylaştığımız Gönderinin Bağlantı Adresi' || col === 'Kaynak İnternet Adresi') {
+        if (cell) {
+          const a = document.createElement('a');
+          a.href = cell; a.target = "_blank"; a.className = "text-blue-500 hover:underline"; a.textContent = "Link";
+          td.appendChild(a);
+        } else td.textContent = '';
+      } else td.textContent = cell;
+      tr.appendChild(td);
+    }
+
+    const actions = document.createElement('td');
+    actions.className = "py-4 px-6 flex items-center space-x-2";
+    actions.innerHTML = `
+      <button onclick="updateSocialMediaStatus(${index}, 'Evet')" class="text-green-600 hover:text-green-800">Evet</button>
+      <button onclick="updateSocialMediaStatus(${index}, 'Belki')" class="text-yellow-600 hover:text-yellow-800">Belki</button>
+      <button onclick="updateSocialMediaStatus(${index}, 'Hayır')" class="text-gray-600 hover:text-gray-800">Hayır</button>
+      <button onclick="editRecord(${index})" class="text-yellow-600 hover:text-yellow-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" /></svg>
+      </button>
+      <button onclick="deleteRecord(${index})" class="text-red-600 hover:text-red-800">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+      </button>
+    `;
+    tr.appendChild(actions);
+    tableBody.appendChild(tr);
+  });
+  updateStats();
+}
+
+function updateStats() {
+  const total = data.length;
+  const shared = data.filter(r => r['Paylaşıldı']).length;
+  const unshared = total - shared;
+  const upcoming = data.filter(isUpcoming).length;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('sharedCount').textContent = shared;
+  document.getElementById('unsharedCount').textContent = unshared;
+  document.getElementById('upcomingCount').textContent = upcoming;
+  document.getElementById('filteredCount').textContent = filteredData.length;
+}
+
+function isUpcoming(row){
+  if (!row['Paylaşım Tarihi']) return false;
+  const planned = new Date(row['Paylaşım Tarihi']);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const tenDays = new Date(); tenDays.setDate(today.getDate()+10); tenDays.setHours(23,59,59,999);
+  return planned >= today && planned <= tenDays && !row['Paylaşıldı'];
+}
+
+// ======= FİLTRE =======
+function updateSectorFilter(){
+  const sectors = [...new Set(data.map(r => r['Sektör']).filter(Boolean))];
+  const sel = document.getElementById('sectorFilter');
+  sel.innerHTML = '<option value="">Tümü</option>';
+  sectors.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
+}
+
+function applyFilters(){
+  let temp = [...data];
+  if (currentShareFilter === 'shared') temp = temp.filter(r => r['Paylaşıldı']);
+  else if (currentShareFilter === 'unshared') temp = temp.filter(r => !r['Paylaşıldı']);
+  else if (currentShareFilter === 'upcoming') temp = temp.filter(isUpcoming);
+
+  const institution = document.getElementById('institutionFilter').value;
+  const sector = document.getElementById('sectorFilter').value;
+  const similarShare = document.getElementById('similarShareFilter').checked;
+  const webSource = document.getElementById('webSourceFilter').checked;
+  const almanacLinked = document.getElementById('almanacFilter').checked;
+  const tuikLinked = document.getElementById('tuikFilter').checked;
+  const routine = document.getElementById('routineFilter').value;
+  const socialMedia = document.getElementById('socialMediaFilter').value;
+
+  filteredData = temp.filter(row => {
+    const matchesInstitution = !institution || row['Kurum'] === institution;
+    const matchesSector = !sector || row['Sektör'] === sector;
+    const matchesSimilarShare = !similarShare || (row['Bakanlık Sosyal Medya Paylaşımı Var mı?'] && row['Bakanlık Sosyal Medya Paylaşımı Var mı?'].toString().toLowerCase() === 'evet');
+    const matchesWebSource = !webSource || (row['Kaynak İnternet Adresi'] && row['Kaynak İnternet Adresi'].trim() !== '');
+    const matchesAlmanac = !almanacLinked || (row['Belirli bir günü ve haftası var mı?'] && row['Belirli bir günü ve haftası var mı?'].toString().toLowerCase() === 'evet');
+    const matchesTUİK = !tuikLinked || (row["TUİK'te var mı?"] && row["TUİK'te var mı?"].toString().toLowerCase() === 'evet');
+    const matchesRoutine = !routine || row['Paylaşım Rutini'] === routine;
+    const matchesSocialMedia = !socialMedia || row['Sosyal Medyada Paylaşılacak mı?'] === socialMedia;
+    return matchesInstitution && matchesSector && matchesSimilarShare && matchesWebSource && matchesAlmanac && matchesTUİK && matchesRoutine && matchesSocialMedia;
+  });
+  updateTable();
+}
+
+function filterByCurrent(){ updateTable(); }
+function filterByShareStatus(status){ currentShareFilter = status; applyFilters(); }
+function filterByUpcoming(){ currentShareFilter = 'upcoming'; applyFilters(); }
+function clearFilters(){
+  document.getElementById('institutionFilter').value='';
+  document.getElementById('sectorFilter').value='';
+  document.getElementById('similarShareFilter').checked=false;
+  document.getElementById('webSourceFilter').checked=false;
+  document.getElementById('almanacFilter').checked=false;
+  document.getElementById('tuikFilter').checked=false;
+  document.getElementById('routineFilter').value='';
+  document.getElementById('socialMediaFilter').value='';
+  currentShareFilter='all'; applyFilters();
+}
+
+// ======= FORM =======
+function populateModalSelects(form){
+  const kurumSelect = form.querySelector('select[name="Kurum"]');
+  kurumSelect.innerHTML = '<option value="">Seçiniz</option>';
+  institutions.forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=k; kurumSelect.appendChild(o); });
+}
+
+function buildFormFields(){
+  const container = document.getElementById('formFields');
+  container.innerHTML = '';
+  const fieldDefs = [
+    ['Kurum','select'],
+    ['Alt Kurum','text'],
+    ['Sektör','text'],
+    ['Paylaşım Konusu','text'],
+    ['Paylaşım Tarihi','date'],
+    ['Belirli bir günü ve haftası var mı?','select-yesno'],
+    ['İrtibat Kişisinin Adı Soyadı','text'],
+    ['İrtibat Kişisinin Ünvanı','text'],
+    ['Sorumlu Kişi İrtibat','text'],
+    ['Paylaştığımız Gönderinin Bağlantı Adresi','text'],
+    ['Açıklama','textarea'],
+    ['Almanakta yer alan belirli gün ve hafta ismi','text'],
+    ['Bakanlığın Paylaşım Metni','textarea'],
+    ["TUİK'te var mı?",'select-yesno'],
+    ["TUİK'te yayımlanma takvimi",'text'],
+    ['Paylaşım Rutini','select-routine'],
+    ['Sosyal Medyada Paylaşılacak mı?','select-social'],
+    ['Kaynak','text'],
+    ['Kaynak İnternet Adresi','url'],
+    ['Bakanlık Sosyal Medya Paylaşımı Var mı?','select-yesno'],
+    ['Paylaşıldı','checkbox']
+  ];
+  for (const [label,type] of fieldDefs){
+    const wrap = document.createElement('div');
+    let inner = '';
+    if (type==='text' || type==='url' || type==='date'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <input type="${type==='text'?'text':type}" name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">`;
+    } else if (type==='textarea'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <textarea name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50"></textarea>`;
+    } else if (type==='select-yesno'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <select name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
+                 <option value="Hayır">Hayır</option><option value="Evet">Evet</option>
+               </select>`;
+    } else if (type==='select-routine'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <select name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
+                 <option value="Spontane">Spontane</option><option value="Aylık">Aylık</option><option value="Yıllık">Yıllık</option>
+               </select>`;
+    } else if (type==='select-social'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <select name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50">
+                 <option value="Hayır">Hayır</option><option value="Evet">Evet</option><option value="Belki">Belki</option>
+               </select>`;
+    } else if (type==='select'){
+      inner = `<label class="block text-sm font-medium text-gray-700">${label}</label>
+               <select name="${label}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50"></select>`;
+    } else if (type==='checkbox'){
+      inner = `<div class="flex items-center space-x-2 mt-2">
+                 <label class="text-sm font-medium text-gray-700">${label}</label>
+                 <input type="checkbox" name="${label}">
+               </div>`;
+    }
+    wrap.innerHTML = inner;
+    container.appendChild(wrap);
+  }
+}
+
+function showNewRecordForm(){
+  editIndex = null;
+  const modal = document.getElementById('newRecordModal');
+  buildFormFields();
+  const form = document.getElementById('recordForm');
+  form.reset();
+  populateModalSelects(form);
+  form.onsubmit = saveRecord;
+  modal.classList.remove('hidden');
+}
+
+function closeNewRecordModal(){
+  document.getElementById('newRecordModal').classList.add('hidden');
+  document.getElementById('recordForm').reset();
+  editIndex = null;
+}
+
+async function saveRecord(e){
+  e.preventDefault();
+  const form = e.target;
+  const formData = new FormData(form);
+  const rec = {};
+  SHEET_COLUMNS.forEach(k => { if (k!=='id') rec[k] = ''; });
+  for (const [key,val] of formData.entries()){
+    if (key === 'Paylaşıldı') rec[key] = form.querySelector('input[name="Paylaşıldı"]').checked;
+    else rec[key] = val;
+  }
+  rec.id = form.querySelector('input[name="id"]').value || uid();
+  if (!rec['Sosyal Medyada Paylaşılacak mı?']) rec['Sosyal Medyada Paylaşılacak mı?'] = 'Hayır';
+  try{
+    const exists = data.find(d => d.id === rec.id);
+    if (exists) await updateOnCloud(rec); else await createOnCloud(rec);
+    await loadFromCloud();
+    closeNewRecordModal();
+  } catch(err){ alert('Kaydetme hatası: ' + err.message); }
+}
+
+function editRecord(index){
+  editIndex = index;
+  const record = filteredData[index];
+  const form = document.getElementById('recordForm');
+  buildFormFields();
+  populateModalSelects(form);
+  form.reset();
+  form.querySelector('input[name="id"]').value = record.id || '';
+  for (const k of Object.keys(record)){
+    const input = form.querySelector(`[name="${k}"]`);
+    if (!input) continue;
+    if (input.type === 'checkbox') input.checked = !!record[k];
+    else input.value = record[k] || '';
+  }
+  form.onsubmit = saveRecord;
+  document.getElementById('newRecordModal').classList.remove('hidden');
+}
+
+async function deleteRecord(index){
+  if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
+  const rec = filteredData[index];
+  try{ await deleteOnCloud(rec.id); await loadFromCloud(); } catch(err){ alert('Silme hatası: ' + err.message); }
+}
+
+async function updateSocialMediaStatus(index, newStatus){
+  const original = filteredData[index];
+  const rec = { ...original };
+  rec['Sosyal Medyada Paylaşılacak mı?'] = newStatus;
+  rec['Paylaşıldı'] = (newStatus === 'Evet');
+  try{ await updateOnCloud(rec); await loadFromCloud(); } catch(err){ alert('Güncelleme hatası: ' + err.message); }
+}
+
+function toggleSelectAll(){
+  const selectAll = document.getElementById('selectAll').checked;
+  document.querySelectorAll('.rowCheckbox').forEach(cb => cb.checked = selectAll);
+}
+
+async function clearData(){
+  if (!confirm('Buluttaki TÜM verileri ve önbelleği silmek istiyor musunuz?')) return;
+  try { await clearCloud(); localStorage.removeItem('shareData_cache'); data=[]; filteredData=[]; updateAfterDataChange(); } catch(err){ alert('Temizleme hatası: ' + err.message); }
+}
+
+// ======= KOLON KONTROLLERİ =======
+function updateColumnCheckboxes(){
+  const container = document.getElementById('columnCheckboxes');
+  container.innerHTML = '';
+  const sorted = Object.keys(allColumns).sort((a,b)=> (allColumns[a]===allColumns[b])?0:(allColumns[a]?-1:1));
+  sorted.forEach(col => {
+    const label = document.createElement('label'); label.className = 'flex items-center';
+    const input = document.createElement('input'); input.type='checkbox'; input.checked = allColumns[col]; input.className='mr-1';
+    input.onchange = () => { allColumns[col] = !allColumns[col]; updateTable(); };
+    const span = document.createElement('span'); span.textContent = formatColumnName(col);
+    label.appendChild(input); label.appendChild(span); container.appendChild(label);
+  });
+}
+
+// ======= BAŞLAT =======
+function initialize(){
+  updateColumnCheckboxes();
+  loadFromCloud().catch(err => { console.error(err); alert('Bulut verisi alınamadı. Lütfen BACKEND_URL ayarlayın.'); });
+  // Drag&drop
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('bg-blue-50'); });
+  dropZone.addEventListener('dragleave', e => { dropZone.classList.remove('bg-blue-50'); });
+  dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('bg-blue-50'); handleFile(e.dataTransfer.files); });
+  // Kayıt dışı tıkla kapat
+  window.onclick = function(event){ const modal=document.getElementById('newRecordModal'); if (event.target==modal) closeNewRecordModal(); }
+}
+initialize();
+</script>
+</body>
+</html>
