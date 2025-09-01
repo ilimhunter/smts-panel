@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sosyal Medya Paylaşım Takip Sistemi (Google Sheets)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+  <h1>SMTS v2 Google Sheets Entegrasyonlu</h1>
+  <p>Bu sürümde veriler Google Sheets'te saklanır. Apps Script URL ayarlandı.</p>
+
+<script>
+// ======= AYARLAR =======
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwRDOtvOzakzoqu-3-Cga-_AUDqarGjbQ_tdimozxqfZLv0m9dZPk2P0DGJ_uOQpt28KA/exec"; // Google Apps Script Web App URL
+
+async function backend(action, payload={}){
+  const res = await fetch(BACKEND_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...payload })
+  });
+  if (!res.ok) throw new Error('Ağ hatası');
+  return await res.json();
+}
+
+// Basit test
+backend('list').then(console.log).catch(console.error);
+</script>
+</body>
+</html>
