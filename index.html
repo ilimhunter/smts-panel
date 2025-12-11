@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gönül Aynası - Mecmua</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f0;
+            background-image: radial-gradient(#e0e0d8 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .arabic-font {
+            font-family: 'Amiri', serif;
+            line-height: 1.6;
+        }
+        .title-font {
+            font-family: 'Cinzel', serif;
+        }
+        .card-container {
+            perspective: 1000px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .card-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .card-front {
+            background-color: #fdfbf7;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230f172a' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .card-back {
+            background: #fffbeb;
+            color: #1e293b;
+            transform: rotateY(180deg);
+        }
+        .ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .ornament::before, .ornament::after {
+            content: "";
+            height: 1px;
+            background-color: currentColor;
+            flex: 1;
+            opacity: 0.5;
+            margin: 0 10px;
+        }
+        /* Custom Scrollbar for list */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+        
+        /* Category Button Active State Styles */
+        .cat-btn-active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800 transition-colors duration-500" id="main-body">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-amber-100 p-4 shadow-lg sticky top-0 z-50 transition-colors duration-500" id="main-header">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <h1 class="text-xl md:text-2xl font-bold title-font tracking-wider flex items-center gap-2">
+                <!-- Hilal Logo -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-300" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+                <span>Gönül Aynası</span>
+            </h1>
+            
+            <!-- Category Tabs -->
+            <div class="flex bg-slate-800/50 rounded-lg p-1 gap-1 overflow-x-auto max-w-full">
+                <button onclick="changeCategory('esma')" id="cat-esma" class="px-3 py-1.5 rounded-md text-sm transition-all text-amber-100 hover:bg-white/10 whitespace-nowrap">Esmaü'l Hüsna</button>
+                <button onclick="changeCategory('ayet')" id="cat-ayet" class="px-3 py-1.5 rounded-md text-sm transition-all text-amber-100 hover:bg-white/10 whitespace-nowrap">Ayet-i Kerime</button>
+                <button onclick="changeCategory('hadis')" id="cat-hadis" class="px-3 py-1.5 rounded-md text-sm transition-all text-amber-100 hover:bg-white/10 whitespace-nowrap">Hadis-i Şerif</button>
+                <button onclick="changeCategory('siir')" id="cat-siir" class="px-3 py-1.5 rounded-md text-sm transition-all text-amber-100 hover:bg-white/10 whitespace-nowrap">Yunus Emre</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 w-full max-w-2xl mx-auto">
+        
+        <!-- View Mode Switcher -->
+        <div class="flex bg-white rounded-full p-1 shadow-md mb-6 w-full max-w-xs border border-slate-200">
+            <button id="btn-tefekkur" onclick="switchView('tefekkur')" class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all shadow-sm">
+                Tefekkür
+            </button>
+            <button id="btn-imtihan" onclick="switchView('imtihan')" class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all hover:bg-slate-50 text-slate-600">
+                İmtihan
+            </button>
+            <button id="btn-liste" onclick="switchView('liste')" class="flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all hover:bg-slate-50 text-slate-600">
+                Liste
+            </button>
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div id="progress-container" class="w-full mb-4 px-2 hidden">
+            <div class="flex justify-between text-xs mb-1 font-semibold opacity-80" id="progress-label-container">
+                <span id="category-label">Esma</span>
+                <span id="progress-text">1 / 99</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+                <div id="progress-bar" class="bg-slate-600 h-2 rounded-full transition-all duration-300" style="width: 1%"></div>
+            </div>
+        </div>
+
+        <!-- TEFEKKÜR MODE (Flashcard) -->
+        <div id="tefekkur-mode" class="w-full h-96 card-container group" onclick="flipCard()">
+            <div id="flashcard" class="card-inner relative w-full h-full">
+                <!-- Front -->
+                <div class="card-front p-6 border-4 transition-colors duration-500" id="card-front-border">
+                    <div class="absolute top-4 left-4 text-xs font-bold opacity-60 border rounded-full px-2 py-0.5" id="card-index">1</div>
+                    <div class="flex-grow flex flex-col justify-center items-center w-full">
+                        <!-- Content Area -->
+                        <div class="arabic-font text-4xl md:text-5xl mb-6 text-center leading-relaxed drop-shadow-sm font-bold w-full px-2" id="card-main-text" style="color: #1e1b4b;">
+                            <!-- Arabic or Main Text goes here -->
+                        </div>
+                        
+                        <div class="ornament w-1/2 opacity-40 text-xl" style="color: #1e1b4b;">❦</div>
+                        
+                        <h2 class="title-font text-lg md:text-xl font-bold tracking-widest uppercase mt-2 text-center px-2" id="card-sub-text" style="color: #1e1b4b;">
+                            <!-- Sub text / Transcription goes here -->
+                        </h2>
+                    </div>
+                    <div class="mt-auto text-sm opacity-60 italic mb-2" style="color: #1e1b4b;">Manası için dokununuz ↻</div>
+                </div>
+                <!-- Back -->
+                <div class="card-back p-8 overflow-y-auto border-2 transition-colors duration-500" id="card-back-border">
+                    <div class="absolute top-4 right-4 opacity-30">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="title-font text-xl font-bold mb-4 border-b-2 pb-2 opacity-80" id="back-title">
+                        <!-- Title -->
+                    </h3>
+                    <p class="text-lg leading-relaxed font-medium text-slate-700" id="card-meaning">
+                        <!-- Meaning goes here -->
+                    </p>
+                    <div class="mt-auto pt-6 opacity-80 flex flex-col items-center gap-2">
+                        <span class="text-2xl">❧</span>
+                        <span class="text-xs opacity-50 italic">Geri dönmek için dokununuz</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLS for Tefekkur -->
+        <div id="controls-tefekkur" class="flex gap-4 mt-8 w-full justify-center items-center">
+            <button onclick="prevCard(event)" class="p-3 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm transition-transform active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            
+            <button onclick="toggleAutoPlay(event)" id="autoplay-btn" class="flex items-center gap-2 px-6 py-3 rounded-full text-white shadow-md transition-transform active:scale-95 font-medium bg-slate-800 hover:bg-slate-700">
+                <span id="play-icon">▶</span> <span id="play-text">Otomatik Oku</span>
+            </button>
+
+            <button onclick="nextCard(event)" class="p-3 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm transition-transform active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- İMTİHAN MODE (Quiz) -->
+        <div id="imtihan-mode" class="hidden w-full max-w-md bg-white p-6 rounded-2xl shadow-xl border border-slate-100">
+            <div class="text-center mb-6">
+                <span id="quiz-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded border">Soru <span id="quiz-q-num">1</span></span>
+                <p class="mt-4 text-lg text-slate-700 font-medium leading-relaxed" id="quiz-question">
+                    ...
+                </p>
+            </div>
+            <div class="grid grid-cols-1 gap-3" id="quiz-options">
+                <!-- Options injected by JS -->
+            </div>
+            <div id="quiz-feedback" class="mt-4 text-center h-6 font-bold text-sm"></div>
+            <button onclick="nextQuestion()" class="w-full mt-4 text-white py-2 rounded-lg hidden transition-colors" id="next-q-btn">Sonraki Sual</button>
+        </div>
+
+        <!-- LISTE MODE -->
+        <div id="liste-mode" class="hidden w-full h-[60vh] overflow-y-auto bg-white rounded-xl shadow-inner border border-slate-200 p-2">
+            <div id="full-list" class="space-y-2">
+                <!-- List injected by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- VERİ HAZİNESİ ---
+        
+        // 1. Esmaü'l Hüsna
+        const dataEsma = [
+            { id: 1, main: "اَللّٰهْ", sub: "ALLAH", mean: "Varlığı zorunlu olan ve bütün övgülere layık bulunan zâtın husûsî ve en kapsamlı ism-i şerifi.", title: "Allah" },
+            { id: 2, main: "اَلرَّحْمٰنُ", sub: "er-Rahmân", mean: "Bütün mahlûkâta merhamet eden, hepsine de nîmetler veren.", title: "er-Rahmân" },
+            { id: 3, main: "اَلرَّح۪يمُ", sub: "er-Rahîm", mean: "Pek ziyâde merhamet edici, bilhassa mü’minlere rahmet eden.", title: "er-Rahîm" },
+            { id: 4, main: "اَلْمَلِكُ", sub: "el-Melik", mean: "Görünen ve görünmeyen alemlerin sahibi.", title: "el-Melik" },
+            { id: 5, main: "اَلْقُدُّوسُ", sub: "el-Kuddûs", mean: "Hatâdan, gafletten, aczden ve her türlü eksiklikten münezzeh/çok uzak ve pek temiz.", title: "el-Kuddûs" },
+            // ... (Devamını kısaltarak örnekleri çoğaltıyoruz)
+            { id: 6, main: "اَلسَّلَامُ", sub: "es-Selâm", mean: "Her çeşit ârıza ve hâdiselerden sâlim kalan, selâmete çıkaran.", title: "es-Selâm" },
+            { id: 7, main: "اَلْمُؤْمِنُ", sub: "el-Mü’min", mean: "Güven veren, emin kılan, koruyan.", title: "el-Mü’min" },
+            { id: 8, main: "اَلْمُهَيْمِنُ", sub: "el-Müheymin", mean: "Kâinâtın bütün işlerini gözetip yöneten.", title: "el-Müheymin" },
+            { id: 9, main: "اَلْعَز۪يزُ", sub: "el-Azîz", mean: "Yenilmeyen yegâne gâlip.", title: "el-Azîz" },
+            { id: 10, main: "اَلْجَبّٰارُ", sub: "el-Cebbâr", mean: "Kırılanları onaran, dilediğini zorla yaptırmaya muktedir olan.", title: "el-Cebbâr" },
+             { id: 11, main: "اَلْمُتَكَبِّرُ", sub: "el-Mütekebbir", mean: "Büyüklükte eşi olmayan.", title: "el-Mütekebbir" },
+            { id: 12, main: "اَلْخَالِقُ", sub: "el-Hâlık", mean: "Yoktan var eden, yaratan.", title: "el-Hâlık" },
+             { id: 99, main: "اَلصَّبُورُ", sub: "es-Sabûr", mean: "Çok sabırlı.", title: "es-Sabûr" }
+             // (Tam liste için önceki veriyi kullanabiliriz, şimdilik numune)
+        ];
+
+        // 2. Ayet-i Kerime (Örnek Seçki)
+        const dataAyet = [
+            { id: 1, main: "وَاِذَا سَاَلَكَ عِبَاد۪ي عَنّ۪ي فَاِنّ۪ي قَر۪يبٌۜ", sub: "Bakara Suresi, 186", mean: "Kullarım sana beni sorduklarında bilsinler ki şüphesiz ben yakınımdır.", title: "Yakınlık" },
+            { id: 2, main: "اَلَٓا بِذِكْرِ اللّٰهِ تَطْمَئِنُّ الْقُلُوبُۜ", sub: "Ra'd Suresi, 28", mean: "Bilesiniz ki, kalpler ancak Allah'ı anmakla huzur bulur.", title: "Huzur" },
+            { id: 3, main: "فَاِنَّ مَعَ الْعُسْرِ يُسْرًاۙ", sub: "İnşirah Suresi, 5", mean: "Şüphesiz güçlükle beraber bir kolaylık vardır.", title: "Ümit" },
+            { id: 4, main: "وَاللّٰهُ يُحِبُّ الصَّابِر۪ينَ", sub: "Âl-i İmrân, 146", mean: "Allah sabredenleri sever.", title: "Sabır" },
+            { id: 5, main: "اِنَّ اللّٰهَ مَعَ الصَّابِر۪ينَ", sub: "Bakara Suresi, 153", mean: "Muhakkak ki Allah sabredenlerle beraberdir.", title: "Beraberlik" },
+            { id: 6, main: "لَا تَحْزَنْ اِنَّ اللّٰهَ مَعَنَا", sub: "Tevbe Suresi, 40", mean: "Üzülme, şüphesiz Allah bizimle beraberdir.", title: "Teselli" },
+            { id: 7, main: "وَقُولُوا لِلنَّاسِ حُسْنًا", sub: "Bakara Suresi, 83", mean: "İnsanlara güzel söz söyleyin.", title: "Tatlı Dil" },
+            { id: 8, main: "رَبَّنَٓا اَفْرِغْ عَلَيْنَا صَبْرًا", sub: "Bakara Suresi, 250", mean: "Ey Rabbimiz! Üzerimize sabır yağdır.", title: "Dua" },
+            { id: 9, main: "وَهُوَ عَلٰى كُلِّ شَيْءٍ قَد۪يرٌ", sub: "Mülk Suresi, 1", mean: "O'nun gücü her şeye hakkıyla yeter.", title: "Kudret" },
+            { id: 10, main: "نَحْنُ اَقْرَبُ اِلَيْهِ مِنْ حَبْلِ الْوَر۪يدِ", sub: "Kâf Suresi, 16", mean: "Biz ona şah damarından daha yakınız.", title: "Yakınlık" }
+        ];
+
+        // 3. Hadis-i Şerif (Riyazussalihin Seçkisi)
+        const dataHadis = [
+            { id: 1, main: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ", sub: "Buhârî, Müslim", mean: "Ameller ancak niyetlere göredir. Herkesin niyeti ne ise eline geçecek olan odur.", title: "Niyet" },
+            { id: 2, main: "الـدِّينُ النَّصِيحَةُ", sub: "Müslim", mean: "Din samimiyettir, içtenliktir.", title: "Samimiyet" },
+            { id: 3, main: "لاَ تَدْخُلُونَ الْجَنَّةَ حَتَّى تُؤْمِنُوا وَلاَ تُؤْمِنُوا حَتَّى تَحَابُّوا", sub: "Müslim", mean: "İman etmedikçe cennete giremezsiniz; birbirinizi sevmedikçe de iman etmiş olmazsınız.", title: "Sevgi" },
+            { id: 4, main: "الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ", sub: "Buhârî", mean: "Güzel söz sadakadır.", title: "Nezaket" },
+            { id: 5, main: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ", sub: "Tirmizî", mean: "Sizin en hayırlınız Kur'an'ı öğrenen ve öğretendir.", title: "İlim" },
+            { id: 6, main: "تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ", sub: "Tirmizî", mean: "Kardeşinin yüzüne tebessüm etmen senin için bir sadakadır.", title: "Tebessüm" },
+            { id: 7, main: "مَنْ لَا يَرْحَمُ لَا يُرْحَمُ", sub: "Buhârî", mean: "Merhamet etmeyene merhamet olunmaz.", title: "Merhamet" },
+            { id: 8, main: "يَسِّرُوا وَلاَ تُعَسِّرُوا، وَبَشِّرُوا وَلاَ تُنَفِّرُوا", sub: "Buhârî", mean: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", title: "Kolaylık" },
+            { id: 9, main: "المَرْءُ مَعَ مَنْ أَحَبَّ", sub: "Buhârî", mean: "Kişi sevdiğiyle beraberdir.", title: "Dostluk" },
+            { id: 10, main: "عَجَبًا لأَمْرِ الْمُؤْمِنِ إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ", sub: "Müslim", mean: "Müminin durumu ne hoştur! Her hâli kendisi için hayırdır.", title: "Tevekkül" }
+        ];
+
+        // 4. Yunus Emre Divanı (Seçki)
+        const dataSiir = [
+            { id: 1, main: "İlim ilim bilmektir, İlim kendin bilmektir", sub: "Yunus Emre", mean: "Sen kendini bilmezsin, ya nice okumaktır?", title: "Kendini Bilmek" },
+            { id: 2, main: "Yaratılanı hoş gör, Yaratan'dan ötürü", sub: "Yunus Emre", mean: "Kimseye hor bakma, incitme gönül; zira her varlık Hakk'ın eseridir.", title: "Hoşgörü" },
+            { id: 3, main: "Sevelim sevilelim, bu dünya kimseye kalmaz", sub: "Yunus Emre", mean: "Kavga ve kin boşunadır, fani dünyada baki kalan sevgidir.", title: "Sevgi" },
+            { id: 4, main: "Bana seni gerek seni", sub: "Yunus Emre", mean: "Ne varlığa sevinirim, ne yokluğa yerinirim, aşkın ile avunurum, bana seni gerek seni.", title: "Aşk" },
+            { id: 5, main: "Bir ben vardır bende, benden içeri", sub: "Yunus Emre", mean: "Görünen bedenden öte, asıl öz olan canan içindedir.", title: "Öz" },
+            { id: 6, main: "Dövene elsiz gerek, sövene dilsiz gerek", sub: "Yunus Emre", mean: "Derviş gönüllü olana, incitene bile karşılık vermemek yaraşır.", title: "Dervişlik" },
+            { id: 7, main: "Mal sahibi, mülk sahibi, hani bunun ilk sahibi?", sub: "Yunus Emre", mean: "Mal da yalan, mülk de yalan, var biraz da sen oyalan.", title: "Fanilik" },
+            { id: 8, main: "Gönül Çalab'ın tahtıdır", sub: "Yunus Emre", mean: "Çalab (Allah) gönüle baktı. İki cihan bedbahtıdır, kim gönül yıkar ise.", title: "Gönül" },
+            { id: 9, main: "Ben gelmedim davi için, benim işim sevi için", sub: "Yunus Emre", mean: "Dostun evi gönüllerdir, gönüller yapmaya geldim.", title: "Hizmet" },
+            { id: 10, main: "Miskin Yunus neylesin, derdin kime söylesin?", sub: "Yunus Emre", mean: "Derdin dermanı yine O'ndadır.", title: "Yakkarış" }
+        ];
+
+        // --- KONFİGÜRASYON ---
+        const configs = {
+            esma: { data: dataEsma, color: 'emerald', label: 'Esma', border: '#064e3b', textMain: '#1e1b4b', textSub: '#1e1b4b', bg: 'emerald' },
+            ayet: { data: dataAyet, color: 'sky', label: 'Ayet', border: '#0c4a6e', textMain: '#0c4a6e', textSub: '#075985', bg: 'sky' },
+            hadis: { data: dataHadis, color: 'rose', label: 'Hadis', border: '#881337', textMain: '#881337', textSub: '#9f1239', bg: 'rose' },
+            siir: { data: dataSiir, color: 'amber', label: 'Şiir', border: '#78350f', textMain: '#451a03', textSub: '#92400e', bg: 'amber' }
+        };
+
+        // --- DURUM DEĞİŞKENLERİ ---
+        let currentCategory = 'esma';
+        let currentData = dataEsma;
+        let currentIndex = 0;
+        let isFlipped = false;
+        let isAutoPlaying = false;
+        let autoPlayInterval;
+        let currentView = 'tefekkur';
+
+        // --- REFERANSLAR ---
+        const cardInner = document.querySelector('.card-inner');
+        const elMain = document.getElementById('card-main-text');
+        const elSub = document.getElementById('card-sub-text');
+        const elMeaning = document.getElementById('card-meaning');
+        const elIndex = document.getElementById('card-index');
+        const elBackTitle = document.getElementById('back-title');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        // --- BAŞLANGIÇ ---
+        function init() {
+            renderCard();
+            renderList();
+            updateTheme();
+            highlightTab('esma');
+            // Başlangıçta tefekkür modu aktif
+            document.getElementById('btn-tefekkur').classList.add('bg-emerald-800', 'text-white', 'shadow-sm');
+        }
+
+        // --- KATEGORİ DEĞİŞTİRME ---
+        function changeCategory(cat) {
+            currentCategory = cat;
+            currentData = configs[cat].data;
+            currentIndex = 0;
+            isFlipped = false;
+            
+            // Eğer kart arkası dönükse düzelt
+            cardInner.classList.remove('card-flipped');
+
+            highlightTab(cat);
+            updateTheme();
+            renderCard();
+            renderList(); // Listeyi de yenile
+            if(currentView === 'imtihan') {
+                initQuiz(); // Quiz sıfırla
+            }
+        }
+
+        function highlightTab(activeCat) {
+            // Tüm butonları temizle
+            ['esma', 'ayet', 'hadis', 'siir'].forEach(c => {
+                const btn = document.getElementById(`cat-${c}`);
+                btn.classList.remove('bg-white', 'text-slate-900', 'cat-btn-active');
+                btn.classList.add('text-amber-100', 'hover:bg-white/10');
+            });
+            // Aktif olanı boya
+            const activeBtn = document.getElementById(`cat-${activeCat}`);
+            activeBtn.classList.remove('text-amber-100', 'hover:bg-white/10');
+            activeBtn.classList.add('bg-white', 'text-slate-900', 'cat-btn-active');
+        }
+
+        function updateTheme() {
+            const conf = configs[currentCategory];
+            const colors = {
+                esma: { header: 'bg-emerald-900', btn: 'bg-emerald-800' },
+                ayet: { header: 'bg-sky-900', btn: 'bg-sky-700' },
+                hadis: { header: 'bg-rose-900', btn: 'bg-rose-800' },
+                siir: { header: 'bg-amber-900', btn: 'bg-amber-800' }
+            };
+
+            const header = document.getElementById('main-header');
+            const playBtn = document.getElementById('autoplay-btn');
+            
+            // Header rengi
+            header.className = `${colors[currentCategory].header} text-amber-100 p-4 shadow-lg sticky top-0 z-50 transition-colors duration-500`;
+            
+            // Kart kenarlıkları ve metin renkleri
+            const frontCard = document.querySelector('.card-front');
+            const backCard = document.querySelector('.card-back');
+            
+            frontCard.style.borderColor = conf.border;
+            backCard.style.borderColor = conf.border;
+            
+            document.getElementById('card-main-text').style.color = conf.textMain;
+            document.getElementById('card-sub-text').style.color = conf.textSub;
+            document.getElementById('card-index').style.borderColor = conf.textSub;
+            document.getElementById('card-index').style.color = conf.textMain;
+
+            // Kategori etiketi
+            document.getElementById('category-label').innerText = conf.label;
+
+            // Aktif buton rengini de güncelle (Tefekkür butonu vs)
+            if(currentView === 'tefekkur') {
+                const activeBtn = document.getElementById('btn-tefekkur');
+                activeBtn.className = `flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all shadow-sm ${colors[currentCategory].btn} text-white`;
+            } else if (currentView === 'imtihan') {
+                 const activeBtn = document.getElementById('btn-imtihan');
+                 activeBtn.className = `flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all shadow-sm ${colors[currentCategory].btn} text-white`;
+            } else {
+                 const activeBtn = document.getElementById('btn-liste');
+                 activeBtn.className = `flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all shadow-sm ${colors[currentCategory].btn} text-white`;
+            }
+
+            // Play butonu
+            if(!isAutoPlaying) {
+                 playBtn.className = `flex items-center gap-2 px-6 py-3 rounded-full text-white shadow-md transition-transform active:scale-95 font-medium ${colors[currentCategory].btn} hover:opacity-90`;
+            }
+        }
+
+        // --- KART RENDER ---
+        function renderCard() {
+            const item = currentData[currentIndex];
+            
+            // Kart dönükse düzelt
+            if(isFlipped) {
+                cardInner.classList.remove('card-flipped');
+                setTimeout(() => updateCardContent(item), 300);
+                isFlipped = false;
+            } else {
+                updateCardContent(item);
+            }
+            updateProgress();
+        }
+
+        function updateCardContent(item) {
+            elMain.innerText = item.main;
+            elSub.innerText = item.sub;
+            elMeaning.innerText = item.mean;
+            elIndex.innerText = item.id;
+            elBackTitle.innerText = item.title;
+        }
+
+        function updateProgress() {
+            const percent = ((currentIndex + 1) / currentData.length) * 100;
+            const conf = configs[currentCategory];
+            // Renkleri dinamik yap
+            const barColor = currentCategory === 'esma' ? 'bg-emerald-600' : 
+                             currentCategory === 'ayet' ? 'bg-sky-600' : 
+                             currentCategory === 'hadis' ? 'bg-rose-600' : 'bg-amber-600';
+            const barBg = currentCategory === 'esma' ? 'bg-emerald-200' : 
+                          currentCategory === 'ayet' ? 'bg-sky-200' : 
+                          currentCategory === 'hadis' ? 'bg-rose-200' : 'bg-amber-200';
+
+            progressBar.className = `${barColor} h-2 rounded-full transition-all duration-300`;
+            progressBar.parentElement.className = `w-full ${barBg} rounded-full h-2`;
+            
+            progressBar.style.width = `${percent}%`;
+            progressText.innerText = `${currentIndex + 1} / ${currentData.length}`;
+        }
+
+        // --- ETKİLEŞİMLER ---
+        function flipCard() {
+            isFlipped = !isFlipped;
+            if(isFlipped) cardInner.classList.add('card-flipped');
+            else cardInner.classList.remove('card-flipped');
+        }
+
+        function nextCard(e) {
+            if(e) e.stopPropagation();
+            if (currentIndex < currentData.length - 1) currentIndex++;
+            else currentIndex = 0;
+            renderCard();
+        }
+
+        function prevCard(e) {
+            if(e) e.stopPropagation();
+            if (currentIndex > 0) currentIndex--;
+            else currentIndex = currentData.length - 1;
+            renderCard();
+        }
+
+        function toggleAutoPlay(e) {
+            if(e) e.stopPropagation();
+            const btn = document.getElementById('autoplay-btn');
+            const icon = document.getElementById('play-icon');
+            const text = document.getElementById('play-text');
+            const conf = configs[currentCategory];
+
+            if (isAutoPlaying) {
+                clearInterval(autoPlayInterval);
+                isAutoPlaying = false;
+                btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                updateTheme(); // Reset to theme color
+                icon.innerText = "▶";
+                text.innerText = "Otomatik Oku";
+            } else {
+                isAutoPlaying = true;
+                btn.className = 'flex items-center gap-2 px-6 py-3 rounded-full text-white shadow-md transition-transform active:scale-95 font-medium bg-red-600 hover:bg-red-700';
+                icon.innerText = "⏸";
+                text.innerText = "Duraklat";
+                
+                autoPlayInterval = setInterval(() => {
+                    if(!isFlipped) {
+                        flipCard();
+                        setTimeout(() => {
+                            nextCard();
+                        }, 4000); 
+                    }
+                }, 6000); 
+            }
+        }
+
+        // --- GÖRÜNÜM DEĞİŞTİRME ---
+        function switchView(view) {
+            currentView = view;
+            
+            // Reset Buttons
+            ['tefekkur', 'imtihan', 'liste'].forEach(v => {
+                document.getElementById(`btn-${v}`).className = 'flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all hover:bg-slate-50 text-slate-600';
+            });
+            
+            // Set Active Button
+            updateTheme(); // This handles the active button color based on category
+
+            // Hide/Show Areas
+            document.getElementById('tefekkur-mode').classList.add('hidden');
+            document.getElementById('imtihan-mode').classList.add('hidden');
+            document.getElementById('liste-mode').classList.add('hidden');
+            document.getElementById('controls-tefekkur').classList.add('hidden');
+            document.getElementById('progress-container').classList.add('hidden');
+
+            if (view === 'tefekkur') {
+                document.getElementById('tefekkur-mode').classList.remove('hidden');
+                document.getElementById('controls-tefekkur').classList.remove('hidden');
+                document.getElementById('progress-container').classList.remove('hidden');
+            } else if (view === 'imtihan') {
+                document.getElementById('imtihan-mode').classList.remove('hidden');
+                initQuiz();
+            } else if (view === 'liste') {
+                document.getElementById('liste-mode').classList.remove('hidden');
+            }
+
+            if (isAutoPlaying) toggleAutoPlay();
+        }
+
+        // --- LİSTE MODU ---
+        function renderList() {
+            const listContainer = document.getElementById('full-list');
+            const conf = configs[currentCategory];
+            let html = '';
+            
+            // Determine styling based on category
+            const badgeBg = currentCategory === 'esma' ? 'bg-emerald-100 text-emerald-800' :
+                            currentCategory === 'ayet' ? 'bg-sky-100 text-sky-800' :
+                            currentCategory === 'hadis' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800';
+
+            currentData.forEach(item => {
+                html += `
+                <div class="flex items-center p-3 hover:bg-slate-50 rounded border-b border-slate-100 last:border-0 transition-colors">
+                    <div class="w-8 h-8 min-w-[2rem] rounded-full ${badgeBg} flex items-center justify-center text-xs font-bold mr-3">${item.id}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-baseline flex-wrap">
+                            <h4 class="font-bold text-slate-800 text-sm">${item.title}</h4>
+                            <span class="arabic-font text-lg text-slate-600 ml-2">${item.main}</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">${item.mean}</p>
+                    </div>
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+        }
+
+        // --- İMTİHAN MODU ---
+        function initQuiz() {
+            generateQuizQuestion();
+            const badge = document.getElementById('quiz-badge');
+            const conf = configs[currentCategory];
+            
+            if(currentCategory === 'esma') badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded border bg-emerald-100 text-emerald-800 border-emerald-200";
+            else if(currentCategory === 'ayet') badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded border bg-sky-100 text-sky-800 border-sky-200";
+            else if(currentCategory === 'hadis') badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded border bg-rose-100 text-rose-800 border-rose-200";
+            else badge.className = "text-xs font-semibold px-2.5 py-0.5 rounded border bg-amber-100 text-amber-800 border-amber-200";
+        }
+
+        function generateQuizQuestion() {
+            const target = currentData[Math.floor(Math.random() * currentData.length)];
+            
+            let options = [target];
+            while(options.length < 4) {
+                const random = currentData[Math.floor(Math.random() * currentData.length)];
+                if(!options.includes(random)) options.push(random);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            document.getElementById('quiz-question').innerText = `"${target.mean}" \n\nmanasına gelen ${configs[currentCategory].label} hangisidir?`;
+            
+            // Button hover colors based on category
+            const hoverClass = currentCategory === 'esma' ? 'hover:bg-emerald-50 hover:border-emerald-300' :
+                               currentCategory === 'ayet' ? 'hover:bg-sky-50 hover:border-sky-300' :
+                               currentCategory === 'hadis' ? 'hover:bg-rose-50 hover:border-rose-300' : 'hover:bg-amber-50 hover:border-amber-300';
+            const textClass = currentCategory === 'esma' ? 'text-emerald-700' :
+                              currentCategory === 'ayet' ? 'text-sky-700' :
+                              currentCategory === 'hadis' ? 'text-rose-700' : 'text-amber-700';
+
+            const optionsHtml = options.map(opt => `
+                <button onclick="checkAnswer(this, '${opt.title}', '${target.title}')" class="w-full text-left p-3 rounded border border-slate-200 ${hoverClass} transition-all">
+                    <span class="arabic-font text-lg mr-2 ${textClass} w-8 inline-block hidden md:inline-block">${opt.main.substring(0, 10)}...</span>
+                    <span class="font-medium text-sm md:text-base">${opt.title}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('quiz-options').innerHTML = optionsHtml;
+            document.getElementById('quiz-feedback').innerHTML = '';
+            document.getElementById('next-q-btn').classList.add('hidden');
+            
+            // Sonraki buton rengi
+            const btnColor = currentCategory === 'esma' ? 'bg-emerald-600 hover:bg-emerald-700' :
+                             currentCategory === 'ayet' ? 'bg-sky-600 hover:bg-sky-700' :
+                             currentCategory === 'hadis' ? 'bg-rose-600 hover:bg-rose-700' : 'bg-amber-600 hover:bg-amber-700';
+            document.getElementById('next-q-btn').className = `w-full mt-4 text-white py-2 rounded-lg hidden transition-colors ${btnColor}`;
+        }
+
+        function checkAnswer(btn, selected, correct) {
+            const allBtns = document.getElementById('quiz-options').children;
+            for(let b of allBtns) {
+                b.disabled = true;
+                if(b.innerText.includes(correct)) {
+                    b.classList.add('bg-green-100', 'border-green-500'); 
+                }
+            }
+
+            const feedback = document.getElementById('quiz-feedback');
+            
+            if(selected === correct) {
+                btn.classList.add('bg-green-200');
+                feedback.innerText = "Maşallah, bildiniz!";
+                feedback.className = "mt-4 text-center h-6 font-bold text-sm text-green-600";
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-300');
+                feedback.innerText = `Doğrusu: ${correct}`;
+                feedback.className = "mt-4 text-center h-6 font-bold text-sm text-red-500";
+            }
+            
+            document.getElementById('next-q-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            generateQuizQuestion();
+        }
+
+        // Başlat
+        init();
+
+    </script>
+</body>
+</html>
