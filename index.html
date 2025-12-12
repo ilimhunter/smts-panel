@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Uygulama İkonu (Güncellenmiş Vav/Kitap Temalı) -->
+    <!-- Uygulama İkonu (Vav/Kitap Temalı) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background-color:%231c1917'><rect width='512' height='512' fill='%231c1917'/><path d='M256 160c-44 0-80 36-80 80s36 80 80 80 80-36 80-80-36-80-80-80zm0 120c-22 0-40-18-40-40s18-40 40-40 40 18 40 40-18 40-40 40z' fill='%23d6d3d1'/><path d='M96 96v320h320V96H96zm280 280H136V136h240v240z' fill='%23d6d3d1' opacity='0.5'/></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background-color:%231c1917'><rect width='512' height='512' fill='%231c1917'/><rect x='64' y='64' width='384' height='384' rx='64' fill='none' stroke='%23d97706' stroke-width='32'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='300' fill='%23d6d3d1' font-weight='bold'>M</text></svg>">
 
@@ -75,6 +75,7 @@
         
         /* Input stili */
         .numara-input:focus { outline: none; border-color: #d97706; }
+        .arama-input:focus { outline: none; border-bottom-color: #d97706; }
     </style>
 </head>
 <body class="bg-stone-100 text-stone-800 h-screen flex flex-col">
@@ -91,22 +92,34 @@
     </header>
 
     <!-- Ana İçerik Sahnesi -->
-    <!-- Boşlukta (Arkaplanda) kaydırma SEKME değiştirir -->
     <main id="ana-sahne" class="flex-1 flex flex-col items-center justify-center p-4 relative overflow-hidden" 
           ontouchstart="dokunmaBasladiArkaPlan(event)" 
           ontouchend="dokunmaBittiArkaPlan(event)">
         
-        <!-- Üst Kontrol: Numara ile Git -->
-        <div id="kontrol-paneli" class="w-full max-w-sm flex justify-between items-center mb-4 px-2 opacity-0 transition-opacity duration-300">
-            <div class="text-stone-500 text-xs font-bold tracking-widest uppercase" id="kategori-baslik">KATEGORİ</div>
-            <div class="flex items-center gap-2 bg-stone-200 rounded-full px-3 py-1 shadow-inner">
-                <span class="text-stone-500 text-xs">No:</span>
-                <input type="number" id="kart-no-input" class="numara-input w-8 bg-transparent text-center text-sm font-bold text-stone-800" min="1" value="1">
-                <span class="text-stone-400 text-xs">/</span>
-                <span id="toplam-kart" class="text-stone-500 text-xs font-semibold">1</span>
-                <button onclick="numarayaGit()" class="ml-1 text-amber-600 hover:text-amber-800">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+        <!-- Üst Kontrol Paneli -->
+        <div id="kontrol-paneli" class="w-full max-w-sm flex flex-col gap-2 mb-4 px-2 opacity-0 transition-opacity duration-300">
+            
+            <!-- Arama Çubuğu (Yeni Özellik) -->
+            <div class="w-full flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-sm border border-stone-200">
+                <svg class="w-4 h-4 text-stone-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="arama-input" placeholder="Başlıklarda ara..." class="w-full text-sm text-stone-700 bg-transparent outline-none placeholder-stone-400" oninput="filtrele(this.value)">
+                <button onclick="aramayiTemizle()" id="temizle-btn" class="hidden text-stone-400 hover:text-red-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
+            </div>
+
+            <!-- Kategori ve Sayı Bilgisi -->
+            <div class="flex justify-between items-center px-1">
+                <div class="text-stone-500 text-xs font-bold tracking-widest uppercase truncate max-w-[50%]" id="kategori-baslik">KATEGORİ</div>
+                <div class="flex items-center gap-2 bg-stone-200 rounded-full px-3 py-1 shadow-inner">
+                    <span class="text-stone-500 text-xs">No:</span>
+                    <input type="number" id="kart-no-input" class="numara-input w-8 bg-transparent text-center text-sm font-bold text-stone-800" min="1" value="1">
+                    <span class="text-stone-400 text-xs">/</span>
+                    <span id="toplam-kart" class="text-stone-500 text-xs font-semibold">1</span>
+                    <button onclick="numarayaGit()" class="ml-1 text-amber-600 hover:text-amber-800">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -252,6 +265,7 @@
         let aktifSekme = 'ayet';
         let aktifKartIndex = 0; // Hangi kartın gösterildiğini tutar
         let zikirSayisi = 0;
+        let aramaMetni = ""; // Filtreleme için yeni değişken
 
         // Sayfa Hazırlığı
         document.addEventListener('DOMContentLoaded', () => {
@@ -270,10 +284,58 @@
             }, 300);
         });
 
-        // 1. KART GÖSTERME MANTIĞI
+        // =================================================================
+        // YENİ ÖZELLİK: FİLTRELEME & VERİ YÖNETİMİ
+        // =================================================================
+
+        function getFiltrelenmisVeriler() {
+            const hamVeriler = MANA_KARTLARI[aktifSekme] || [];
+            if (!aramaMetni) return hamVeriler;
+            
+            // Türkçe karakter duyarlı arama
+            const kucukArama = aramaMetni.toLocaleLowerCase('tr');
+            return hamVeriler.filter(kart => 
+                kart.baslik.toLocaleLowerCase('tr').includes(kucukArama)
+            );
+        }
+
+        function filtrele(deger) {
+            aramaMetni = deger;
+            aktifKartIndex = 0; // Filtre değişince başa dön
+            
+            // X (Temizle) butonunu göster/gizle
+            const temizleBtn = document.getElementById('temizle-btn');
+            if(deger.length > 0) temizleBtn.classList.remove('hidden');
+            else temizleBtn.classList.add('hidden');
+            
+            kartGoster(0);
+        }
+
+        function aramayiTemizle() {
+            document.getElementById('arama-input').value = "";
+            filtrele("");
+        }
+
+        // =================================================================
+        // KART GÖSTERME MANTIĞI (GÜNCELLENDİ)
+        // =================================================================
+        
         function kartGoster(index, yon = 'normal') {
-            const veriler = MANA_KARTLARI[aktifSekme];
-            if (!veriler || veriler.length === 0) return;
+            const veriler = getFiltrelenmisVeriler();
+            const wrapper = document.getElementById('kart-wrapper');
+
+            // Eğer hiç veri yoksa (Filtre sonucu boşsa)
+            if (!veriler || veriler.length === 0) {
+                wrapper.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-6 fade-in">
+                        <svg class="w-12 h-12 text-stone-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <p class="text-stone-400 text-sm italic">"Bu denizde aradığın inci şu an bulunamadı azizim..."</p>
+                    </div>
+                `;
+                document.getElementById('toplam-kart').innerText = "0";
+                document.getElementById('kart-no-input').value = 0;
+                return;
+            }
 
             // Sınır Kontrolü
             if (index < 0) index = veriler.length - 1; // Başın sonu
@@ -287,7 +349,6 @@
             document.getElementById('toplam-kart').innerText = veriler.length;
 
             const veri = veriler[aktifKartIndex];
-            const wrapper = document.getElementById('kart-wrapper');
 
             // Yeni Kart HTML
             const html = `
@@ -327,21 +388,27 @@
         }
 
         function rastgeleKart() {
-            const veriler = MANA_KARTLARI[aktifSekme];
+            const veriler = getFiltrelenmisVeriler();
             if (veriler.length > 1) {
                 let yeniIndex;
                 do {
                     yeniIndex = Math.floor(Math.random() * veriler.length);
                 } while (yeniIndex === aktifKartIndex); // Aynısı gelmesin
                 kartGoster(yeniIndex);
+            } else if (veriler.length === 1) {
+                // Sadece 1 kart varsa (veya filtre sonucu 1 ise) onu göster
+                kartGoster(0);
             }
         }
 
         function numarayaGit() {
             const input = document.getElementById('kart-no-input');
             let val = parseInt(input.value);
-            const max = MANA_KARTLARI[aktifSekme].length;
+            const veriler = getFiltrelenmisVeriler();
+            const max = veriler.length;
             
+            if (max === 0) return;
+
             if(val < 1) val = 1;
             if(val > max) val = max;
             
@@ -368,7 +435,8 @@
         function sekmeDegistir(yeniId) {
             if (aktifSekme === yeniId) return;
             aktifSekme = yeniId;
-            aktifKartIndex = 0; // Kategori değişince başa dön
+            aramayiTemizle(); // Sekme değişince aramayı sıfırla ki kafa karışmasın
+            aktifKartIndex = 0; 
             navigasyonuOlustur();
             kartGoster(0);
         }
