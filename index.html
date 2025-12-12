@@ -2,61 +2,70 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gönül Defteri</title>
-    
-    <!-- PWA / Mobile Web App Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1c1917"> <!-- Koyu taş rengi, ciddiyet ve sükunet -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f766e">
-    <meta name="application-name" content="Gönül Defteri">
-    <meta name="apple-mobile-web-app-title" content="Gönül Defteri">
+    <title>Mana Defteri</title>
 
-    <!-- Tailwind CSS (CDN) -->
+    <!-- Tailwind CSS (Zahiri Güzellik İçin) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fonts: Inter (UI) and Amiri (Arabic/Text) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Başlıklar için mistik bir font, yazılar için okunaklı bir font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <!-- Embedded App Icon (SVG -> Base64) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%230f766e' d='M0 0h512v512H0z'/%3E%3Cpath fill='%23fff' d='M256 96l-64 128-128 64 128 64 64 128 64-128 128-64-128-64z'/%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%230f766e' d='M0 0h512v512H0z'/%3E%3Cpath fill='%23fff' d='M256 96l-64 128-128 64 128 64 64 128 64-128 128-64-128-64z'/%3E%3C/svg%3E">
+    <!-- Uygulama İkonu (SVG Base64) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231c1917' rx='20'/><path d='M50 20 C30 20 20 40 20 60 C20 80 40 90 50 90 C60 90 80 80 80 60 C80 40 70 20 50 20 Z' fill='none' stroke='%23d6d3d1' stroke-width='4'/><circle cx='50' cy='55' r='15' fill='%23d6d3d1'/></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231c1917' rx='20'/><path d='M50 20 C30 20 20 40 20 60 C20 80 40 90 50 90 C60 90 80 80 80 60 C80 40 70 20 50 20 Z' fill='none' stroke='%23d6d3d1' stroke-width='4'/><circle cx='50' cy='55' r='15' fill='%23d6d3d1'/></svg>">
 
     <style>
-        /* Custom Styling for App Feel */
+        /* Tasavvufi Dokunuşlar (Özel CSS) */
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* Taş kağıt rengi */
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             -webkit-user-select: none;
-            overscroll-behavior-y: none; /* Prevent pull-to-refresh */
+            overflow: hidden; /* Uygulama hissi için kaydırmayı biz yöneteceğiz */
         }
 
-        .serif-text {
-            font-family: 'Playfair Display', serif;
+        h1, h2, h3, .tasavvuf-font {
+            font-family: 'Cinzel', serif;
         }
 
-        /* Smooth tab transition */
-        .tab-content {
-            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s ease;
+        /* 3D Kart Efekti */
+        .kart-sahne {
+            perspective: 1000px;
         }
 
-        /* Glass effect */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        .kart {
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            transform-style: preserve-3d;
+            position: relative;
         }
 
-        /* Button Press Effect */
-        .active-press:active {
-            transform: scale(0.95);
-            opacity: 0.8;
+        .kart.cevrildi {
+            transform: rotateY(180deg);
         }
 
-        /* Hide scrollbar but allow scroll */
+        .kart-yuz {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+        }
+
+        .kart-arka {
+            transform: rotateY(180deg);
+        }
+
+        /* Scrollbar Gizleme */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -64,309 +73,314 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* Sekme Geçiş Animasyonu */
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Zikirmatik Butonu Efekti */
+        .btn-press:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
-<body class="bg-gray-100 h-screen w-screen overflow-hidden flex flex-col text-gray-800">
+<body class="bg-stone-100 text-stone-800 h-screen flex flex-col">
 
-    <!-- Background Pattern Decoration -->
-    <div class="fixed inset-0 z-0 opacity-5 pointer-events-none">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <pattern id="islamic-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M0 20 L20 0 L40 20 L20 40 Z" fill="none" stroke="currentColor" stroke-width="1"/>
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#islamic-pattern)" />
-        </svg>
-    </div>
-
-    <!-- Header -->
-    <header class="relative z-10 bg-teal-700 text-white pt-safe-top pb-4 px-6 shadow-lg flex justify-between items-center transition-all duration-300" style="padding-top: max(20px, env(safe-area-inset-top));">
-        <div>
-            <h1 id="header-title" class="text-2xl font-bold tracking-wide">Esmaül Hüsna</h1>
-            <p class="text-xs text-teal-200 opacity-90 mt-1">Gönül Defteri</p>
+    <!-- Üst Bar: Gönül Meclisi -->
+    <header class="bg-stone-900 text-stone-200 p-4 shadow-lg z-20 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-3">
+            <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            <h1 class="text-xl font-bold tracking-wide text-amber-500">Mana Defteri</h1>
         </div>
-        <button onclick="shareContent()" class="active-press p-2 rounded-full bg-teal-800/50">
-            <!-- Share Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        <button onclick="zikirmatikAc()" class="text-stone-400 hover:text-amber-400 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </button>
     </header>
 
-    <!-- Main Content Area (Swipeable) -->
-    <main id="main-container" class="relative z-10 flex-1 w-full overflow-hidden flex items-center justify-center">
-        <!-- Content gets injected here -->
-        <div id="content-card" class="w-11/12 max-w-md h-3/4 max-h-[600px] perspective-1000">
-            <div id="card-inner" class="relative w-full h-full transition-transform duration-500 transform-style-3d">
-                
-                <!-- Front Side -->
-                <div class="glass-panel w-full h-full rounded-3xl p-8 flex flex-col items-center justify-center text-center absolute backface-hidden shadow-2xl">
-                    <div id="card-icon" class="mb-6 text-teal-600">
-                        <!-- Dynamic Icon -->
-                    </div>
-                    
-                    <div class="flex-1 flex flex-col justify-center items-center w-full overflow-y-auto no-scrollbar">
-                        <h2 id="card-title" class="text-3xl font-bold text-teal-800 mb-4 font-serif"></h2>
-                        <p id="card-arabic" class="text-2xl text-gray-600 mb-4 font-[Amiri] dir-rtl leading-loose hidden"></p>
-                        <p id="card-body" class="text-lg text-gray-700 leading-relaxed serif-text"></p>
-                        <p id="card-source" class="mt-6 text-sm text-gray-400 italic font-medium"></p>
-                    </div>
-
-                    <div class="mt-6 w-full">
-                         <button onclick="nextContent()" class="active-press w-full py-4 bg-teal-600 text-white rounded-xl font-semibold shadow-lg shadow-teal-600/30 flex items-center justify-center gap-2">
-                            <span>Yeni Kart Getir</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/></svg>
-                        </button>
-                        <p class="text-xs text-gray-400 mt-3">Sekme değiştirmek için sağa/sola kaydırın</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <!-- Ana İçerik Sahnesi -->
+    <main id="icerik-alani" class="flex-1 overflow-y-auto no-scrollbar p-4 pb-24 relative" ontouchstart="dokunmaBasladi(event)" ontouchend="dokunmaBitti(event)">
+        <!-- İçerik JavaScript ile buraya doldurulacak -->
     </main>
 
-    <!-- Bottom Navigation -->
-    <nav class="relative z-20 bg-white pb-safe-bottom border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]" style="padding-bottom: env(safe-area-inset-bottom);">
-        <div class="flex justify-around items-center h-16">
-            <button onclick="switchTab('esma')" class="nav-btn group flex flex-col items-center justify-center w-full h-full text-teal-600" data-tab="esma">
-                <div class="p-1 rounded-xl transition-colors duration-300 group-hover:bg-teal-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>
-                </div>
-                <span class="text-[10px] font-semibold mt-1">Esma</span>
-            </button>
-            
-            <button onclick="switchTab('ayet')" class="nav-btn group flex flex-col items-center justify-center w-full h-full text-gray-400" data-tab="ayet">
-                <div class="p-1 rounded-xl transition-colors duration-300 group-hover:bg-teal-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                </div>
-                <span class="text-[10px] font-semibold mt-1">Ayet</span>
-            </button>
+    <!-- Zikirmatik Modalı (Gizli) -->
+    <div id="zikirmatik-modal" class="fixed inset-0 bg-stone-900/90 z-50 hidden flex items-center justify-center backdrop-blur-sm transition-opacity duration-300 opacity-0">
+        <div class="bg-stone-800 p-8 rounded-2xl shadow-2xl text-center border border-stone-700 w-3/4 max-w-sm">
+            <h3 class="text-amber-500 text-2xl mb-4 tasavvuf-font">Zikirmatik</h3>
+            <div class="bg-stone-900 rounded-lg p-6 mb-6 shadow-inner border border-stone-700">
+                <span id="zikir-sayisi" class="text-6xl text-emerald-500 font-mono">0</span>
+            </div>
+            <div class="flex justify-center gap-4">
+                <button onclick="zikirCek()" class="btn-press w-20 h-20 rounded-full bg-emerald-700 text-white shadow-lg border-4 border-emerald-900 flex items-center justify-center text-xl">
+                    Hu
+                </button>
+                <button onclick="zikirSifirla()" class="btn-press w-12 h-12 rounded-full bg-red-900/50 text-red-200 border-2 border-red-800 flex items-center justify-center mt-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                </button>
+            </div>
+            <button onclick="zikirmatikKapat()" class="mt-6 text-stone-400 text-sm underline">Meclise Dön</button>
+        </div>
+    </div>
 
-            <button onclick="switchTab('hadis')" class="nav-btn group flex flex-col items-center justify-center w-full h-full text-gray-400" data-tab="hadis">
-                <div class="p-1 rounded-xl transition-colors duration-300 group-hover:bg-teal-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                </div>
-                <span class="text-[10px] font-semibold mt-1">Hadis</span>
-            </button>
-
-            <button onclick="switchTab('beyit')" class="nav-btn group flex flex-col items-center justify-center w-full h-full text-gray-400" data-tab="beyit">
-                <div class="p-1 rounded-xl transition-colors duration-300 group-hover:bg-teal-50">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19c-2.3 0-6.4-.2-8.1-.6-.7-.2-1.2-.7-1.4-1.4-.3-1.1-.5-3.4-.5-5s.2-3.9.5-5c.2-.7.7-1.2 1.4-1.4C5.6 5.2 9.7 5 12 5s6.4.2 8.1.6c.7.2 1.2.7 1.4 1.4.3 1.1.5 3.4.5 5s-.2 3.9-.5 5c-.2.7-.7 1.2-1.4 1.4-1.7.4-5.8.6-8.1.6 0 0 0 0 0 0z"></path><path d="M12 5v14"></path><path d="M15 11l-3-3-3 3"></path></svg>
-                </div>
-                <span class="text-[10px] font-semibold mt-1">Beyit</span>
-            </button>
+    <!-- Alt Navigasyon Barı -->
+    <nav class="bg-stone-900 shadow-[0_-5px_15px_rgba(0,0,0,0.3)] shrink-0 pb-safe">
+        <div class="flex justify-around items-center p-2">
+            <!-- Butonlar JS ile oluşturulacak -->
+            <div id="nav-container" class="flex w-full justify-around"></div>
         </div>
     </nav>
 
-    <!-- Overlay for Transitions -->
-    <div id="transition-overlay" class="fixed inset-0 bg-teal-800 z-50 pointer-events-none opacity-0 transition-opacity duration-300"></div>
-
+    <!-- JAVASCRIPT: Ruh ve Mantık -->
     <script>
-        // --- DATA SOURCE ---
-        const contentData = {
-            esma: [
-                { title: "Er-Rahman", body: "Dünyada bütün mahlûkata merhamet eden, şefkat gösteren, ihsan eden.", source: "Celle Celaluhu" },
-                { title: "Er-Rahim", body: "Ahirette, müminlere sonsuz ikram, lütuf ve ihsanda bulunan.", source: "Celle Celaluhu" },
-                { title: "El-Melik", body: "Mülkün, kâinatın sahibi, mülk ve saltanatı devamlı olan.", source: "Celle Celaluhu" },
-                { title: "El-Kuddüs", body: "Her türlü eksiklikten, noksanlıktan uzak ve tertemiz olan.", source: "Celle Celaluhu" },
-                { title: "El-Selam", body: "Her türlü tehlikeden kullarını selamete çıkaran.", source: "Celle Celaluhu" },
-                { title: "El-Mü'min", body: "Güven veren, emin kılan, koruyan.", source: "Celle Celaluhu" },
-                { title: "El-Müheymin", body: "Her şeyi görüp gözeten, her varlığın yaptıklarından haberdar olan.", source: "Celle Celaluhu" },
-                { title: "El-Aziz", body: "İzzet sahibi, her şeye galip olan.", source: "Celle Celaluhu" },
-                { title: "El-Cebbar", body: "Azamet ve kudret sahibi. Dilediğini mutlak yapan.", source: "Celle Celaluhu" },
-                { title: "El-Mütekebbir", body: "Büyüklükte eşi, benzeri olmayan.", source: "Celle Celaluhu" }
-            ],
+        // =================================================================
+        // AZİZİM, HİKMET HAZİNESİNİ BURADAN DÜZENLEYEBİLİRSİN
+        // Buradaki tırnak işaretlerinin içindeki metinleri değiştirmen yeterlidir.
+        // =================================================================
+        
+        const MANA_KARTLARI = {
             ayet: [
-                { title: "İnşirah Suresi, 5-6", arabic: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا \n إِنَّ مَعَ الْعُسْرِ يُسْرًا", body: "Elbette zorluğun yanında bir kolaylık vardır. Gerçekten, zorlukla beraber bir kolaylık daha vardır.", source: "Kur'an-ı Kerim" },
-                { title: "Bakara, 153", arabic: "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ", body: "Ey iman edenler! Sabır ve namaz ile Allah’tan yardım isteyin. Muhakkak ki Allah sabredenlerle beraberdir.", source: "Kur'an-ı Kerim" },
-                { title: "Talak, 3", arabic: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ", body: "Kim Allah’a güvenirse O, ona yeter.", source: "Kur'an-ı Kerim" },
-                { title: "Rad, 28", arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", body: "Bilesiniz ki, kalpler ancak Allah’ı anmakla huzur bulur.", source: "Kur'an-ı Kerim" },
-                { title: "Furkan, 63", arabic: "وَعِبَادُ الرَّحْمَنِ الَّذِينَ يَمْشُونَ عَلَى الْأَرْضِ هَوْنًا", body: "Rahmân’ın kulları, yeryüzünde vakar ve tevazu ile yürüyen kimselerdir.", source: "Kur'an-ı Kerim" }
+                {
+                    baslik: "İnşirah Suresi, 5-6",
+                    onYuz: "Muhakkak ki, zorlukla beraber bir kolaylık vardır.",
+                    arkaYuz: "Bu ayet, dervişin gönlüne su serper. Bilir ki her celal tecellisinin içinde bir cemal gizlidir. Daralma (kabz) varsa, genişleme (bast) yoldadır. Sabır, acı değil, müjdenin anahtarıdır."
+                },
+                {
+                    baslik: "Bakara Suresi, 115",
+                    onYuz: "Doğu da Allah'ındır batı da. Nereye dönerseniz Allah'ın yüzü oradadır.",
+                    arkaYuz: "Vahdet-i Vücud'un temel taşlarından biri. Derviş nereye baksa Hakk'ı görür. Yönler, mekanlar sınırlıdır; O ise sınırsızdır. Her zerrede O'nun esması tecelli eder."
+                },
+                {
+                    baslik: "Kaf Suresi, 16",
+                    onYuz: "Biz ona şah damarından daha yakınız.",
+                    arkaYuz: "Allah'ı uzaklarda arama ey yolcu. O, senin 'ben' dediğin yerden daha yakındır sana. Nefs perdesini kaldırırsan, O'nunla baş başa kalırsın."
+                }
             ],
             hadis: [
-                { title: "Hadis-i Şerif", body: "Kolaylaştırınız, zorlaştırmayınız; müjdeleyiniz, nefret ettirmeyiniz.", source: "Buhârî, İlim, 11" },
-                { title: "Hadis-i Şerif", body: "Sizin en hayırlınız, ahlakı en güzel olanınızdır.", source: "Buhârî, Edeb, 39" },
-                { title: "Hadis-i Şerif", body: "Mümin, diğer insanların elinden ve dilinden emin olduğu kimsedir.", source: "Tirmizî, İman, 12" },
-                { title: "Hadis-i Şerif", body: "Ameller niyetlere göredir.", source: "Buhârî, Bed’ü’l-Vahy, 1" },
-                { title: "Hadis-i Şerif", body: "İki günü eşit olan ziyandadır.", source: "Deylemî" }
+                {
+                    baslik: "Kudsi Hadis",
+                    onYuz: "Ben, kulumun zannı üzereyim.",
+                    arkaYuz: "Kul, Rabbi hakkında ne düşünürse, Rabbi ona öyle tecelli eder. Ümitvar olan rahmet bulur, korkan emniyet. Gönlünü hüsn-ü zan ile süsle azizim."
+                },
+                {
+                    baslik: "Hadis-i Şerif",
+                    onYuz: "Nefsini bilen Rabbini bilir.",
+                    arkaYuz: "Kendi acziyetini, hiçliğini anlayan kişi; Rabbinin kudretini ve varlığını idrak eder. Yolculuk dışarıya değil, içeriye, öz benliğedir."
+                }
             ],
-            beyit: [
-                { title: "Yunus Emre", body: "İlim ilim bilmektir, \nİlim kendin bilmektir, \nSen kendini bilmezsin, \nYa nice okumaktır.", source: "Divan" },
-                { title: "Niyâzî-i Mısrî", body: "Derman arardım derdime, derdim bana derman imiş. \nBürhân sorardım aslıma, aslım bana bürhân imiş.", source: "Divan-ı Mısrî" },
-                { title: "Mevlânâ", body: "Dünle beraber gitti cancağızım, \nNe kadar söz varsa düne ait. \nŞimdi yeni şeyler söylemek lazım.", source: "Mesnevi" },
-                { title: "Eşrefoğlu Rûmî", body: "Ey Allah'ım beni senden ayırma, \nBeni senin cemalinden ayırma. \nSeni sevmek benim dinim imanım, \nİlahi dini imandan ayırma.", source: "Divan" },
-                { title: "Alvarlı Efe", body: "Sakın incitme bir canı, \nYıkarsın arş-ı Rahman'ı.", source: "Hülâsatü'l-Hakâyık" }
+            tasavvuf: [
+                {
+                    baslik: "İbni Arabi (k.s.)",
+                    onYuz: "Sen sandığın şey değilsin, sen O'sun.",
+                    arkaYuz: "Varlığın hakiki sahibi Allah'tır. Senin varlığın, güneşin vurduğu aynadaki yansıma gibidir. Ayna da sen değilsin, ışık da. Sen sadece tecelligahsın."
+                },
+                {
+                    baslik: "Yunus Emre",
+                    onYuz: "Beni bende demen bende değilim, bir ben vardır bende benden içeri.",
+                    arkaYuz: "Yunus bizim dilimizdir. O, bedeni kafes, ruhu kuşa benzetir. Asıl kimlik, et ve kemik değil, o İlahi nefestir."
+                },
+                {
+                    baslik: "Hz. Mevlana",
+                    onYuz: "Dün akıllıydım dünyayı değiştirmek isterdim. Bugün bilgeyim kendimi değiştiriyorum.",
+                    arkaYuz: "Dervişin cihadı nefsi iledir. Dış dünyadaki kavga bitmez, ama içindeki kavga biterse bütün alem selamete erer."
+                }
+            ],
+            tarih: [
+                {
+                    baslik: "Bedir Kuyuları",
+                    onYuz: "313 Sahabe ve Meleklerin yardımı.",
+                    arkaYuz: "Sayıların çokluğu değil, imanın kuvveti galip gelir. Tarih, Hakk'a dayananların zaferleriyle doludur. Bedir, bir ruh halidir; kıyamete kadar her müminin kalbinde yaşanır."
+                },
+                {
+                    baslik: "İstanbul'un Fethi",
+                    onYuz: "Ya ben İstanbul'u alırım, ya İstanbul beni.",
+                    arkaYuz: "Fatih Sultan Mehmed Han, sadece bir şehri değil, gönülleri de fethetmiştir. Maddi kılıç ile manevi dua birleşince fetih müyesser olur."
+                }
+            ],
+            gonul: [
+                {
+                    baslik: "Gece Duası",
+                    onYuz: "Rabbim, beni bana bırakma.",
+                    arkaYuz: "En büyük felaket, insanın nefsiyle baş başa kalmasıdır. Gönlümüze düşen en samimi yakarış budur."
+                },
+                {
+                    baslik: "Tefekkür",
+                    onYuz: "Bir yaprak bile O'nun izni olmadan düşmez.",
+                    arkaYuz: "Bugün gördüğüm sararmış yaprak bana ölümü değil, teslimiyeti hatırlattı. Rüzgar nereye eserse, yaprak itirazsız oraya gider."
+                }
             ]
         };
 
-        // --- STATE MANAGEMENT ---
-        let currentTab = 'esma';
-        let currentIndex = { esma: 0, ayet: 0, hadis: 0, beyit: 0 };
+        // =================================================================
+        // SİSTEM KODLARI (BU KISIM MAKİNENİN ÇARKLARIDIR)
+        // =================================================================
 
-        // --- DOM ELEMENTS ---
-        const mainContainer = document.getElementById('main-container');
-        const cardTitle = document.getElementById('card-title');
-        const cardBody = document.getElementById('card-body');
-        const cardSource = document.getElementById('card-source');
-        const cardArabic = document.getElementById('card-arabic');
-        const cardIcon = document.getElementById('card-icon');
-        const headerTitle = document.getElementById('header-title');
-        const transitionOverlay = document.getElementById('transition-overlay');
+        const sekmeler = [
+            { id: 'ayet', ad: 'Ayetler', ikon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
+            { id: 'hadis', ad: 'Hadisler', ikon: 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z' },
+            { id: 'tasavvuf', ad: 'Hikmet', ikon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+            { id: 'tarih', ad: 'Tarih', ikon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+            { id: 'gonul', ad: 'Gönül', ikon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z' }
+        ];
 
-        // --- ICONS (SVG Strings) ---
-        const icons = {
-            esma: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>`,
-            ayet: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
-            hadis: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`,
-            beyit: `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`
-        };
+        let aktifSekme = 'ayet';
+        let zikirSayisi = 0;
 
-        const titles = {
-            esma: "Esmaül Hüsna",
-            ayet: "Günün Ayeti",
-            hadis: "Hadis-i Şerif",
-            beyit: "Gönül Beyitleri"
-        };
+        // Sayfa Yüklendiğinde
+        document.addEventListener('DOMContentLoaded', () => {
+            navigasyonuOlustur();
+            icerigiYukle(aktifSekme);
+            
+            // Zikir sayısını hafızadan al
+            const kayitliZikir = localStorage.getItem('zikirSayisi');
+            if(kayitliZikir) zikirSayisi = parseInt(kayitliZikir);
+            document.getElementById('zikir-sayisi').innerText = zikirSayisi;
+        });
 
-        // --- LOGIC ---
+        // Navigasyon Barını Oluştur
+        function navigasyonuOlustur() {
+            const container = document.getElementById('nav-container');
+            container.innerHTML = '';
+            
+            sekmeler.forEach(sekme => {
+                const btn = document.createElement('button');
+                btn.className = `flex flex-col items-center gap-1 p-2 transition-all duration-300 ${aktifSekme === sekme.id ? 'text-amber-500 scale-110' : 'text-stone-500'}`;
+                btn.onclick = () => sekmeDegistir(sekme.id);
+                btn.innerHTML = `
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${sekme.ikon}"></path></svg>
+                    <span class="text-[10px] font-medium tracking-wide">${sekme.ad}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
 
-        function updateUI() {
-            // Update Tab Selection
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.tab === currentTab) {
-                    btn.classList.add('text-teal-600');
-                    btn.classList.remove('text-gray-400');
-                } else {
-                    btn.classList.remove('text-teal-600');
-                    btn.classList.add('text-gray-400');
-                }
+        // Sekme Değiştirme
+        function sekmeDegistir(yeniId) {
+            if (aktifSekme === yeniId) return;
+            aktifSekme = yeniId;
+            navigasyonuOlustur();
+            icerigiYukle(yeniId);
+        }
+
+        // İçeriği Ekrana Bas (Kartları Oluştur)
+        function icerigiYukle(kategori) {
+            const alan = document.getElementById('icerik-alani');
+            alan.innerHTML = ''; // Temizle
+            
+            const veriler = MANA_KARTLARI[kategori];
+            
+            if (!veriler || veriler.length === 0) {
+                alan.innerHTML = `<div class="flex h-full items-center justify-center text-stone-400 italic">Henüz bu sayfaya bir kelam düşmedi azizim...</div>`;
+                return;
+            }
+
+            const listeDiv = document.createElement('div');
+            listeDiv.className = 'flex flex-col gap-6 fade-in pb-8';
+
+            veriler.forEach((veri, index) => {
+                // Kart Sahnesi
+                const sahne = document.createElement('div');
+                sahne.className = 'kart-sahne h-64 w-full cursor-pointer group';
+                sahne.onclick = function() {
+                    this.querySelector('.kart').classList.toggle('cevrildi');
+                };
+
+                // Kartın Kendisi
+                const kart = document.createElement('div');
+                kart.className = 'kart w-full h-full shadow-[0_10px_20px_rgba(0,0,0,0.15)] rounded-2xl';
+
+                // Ön Yüz
+                const onYuz = document.createElement('div');
+                onYuz.className = 'kart-yuz bg-white border border-stone-200 p-6 flex flex-col justify-center items-center text-center rounded-2xl bg-[url("https://www.transparenttextures.com/patterns/cream-paper.png")]';
+                onYuz.innerHTML = `
+                    <div class="text-amber-600 font-bold text-sm mb-2 uppercase tracking-widest border-b border-amber-200 pb-1">${veri.baslik}</div>
+                    <div class="text-stone-800 text-xl font-serif leading-relaxed tasavvuf-font">"${veri.onYuz}"</div>
+                    <div class="absolute bottom-4 text-stone-400 text-xs flex items-center gap-1">
+                        <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Manası için dokun
+                    </div>
+                `;
+
+                // Arka Yüz
+                const arkaYuz = document.createElement('div');
+                arkaYuz.className = 'kart-arka kart-yuz bg-stone-800 text-stone-200 p-6 flex flex-col justify-center items-center text-center rounded-2xl border border-stone-700 bg-[url("https://www.transparenttextures.com/patterns/stardust.png")]';
+                arkaYuz.innerHTML = `
+                    <div class="text-amber-500 font-bold text-lg mb-3 tasavvuf-font">Batıni Mana</div>
+                    <div class="text-stone-300 text-base leading-relaxed overflow-y-auto max-h-full no-scrollbar">${veri.arkaYuz}</div>
+                `;
+
+                kart.appendChild(onYuz);
+                kart.appendChild(arkaYuz);
+                sahne.appendChild(kart);
+                listeDiv.appendChild(sahne);
             });
 
-            // Update Header
-            headerTitle.innerText = titles[currentTab];
-
-            // Render Card Content
-            renderCard();
+            alan.appendChild(listeDiv);
         }
 
-        function renderCard() {
-            const dataList = contentData[currentTab];
-            const idx = currentIndex[currentTab];
-            const item = dataList[idx];
+        // Swipe (Kaydırma) Algılama
+        let dokunmaBaslangicX = 0;
+        let dokunmaBitisX = 0;
 
-            cardTitle.innerText = item.title;
-            cardBody.innerHTML = item.body.replace(/\n/g, '<br/>'); // Handle newlines
-            cardSource.innerText = item.source;
-            cardIcon.innerHTML = icons[currentTab];
-
-            // Handle Arabic Text specifically for Ayets
-            if (item.arabic) {
-                cardArabic.innerText = item.arabic;
-                cardArabic.classList.remove('hidden');
-            } else {
-                cardArabic.classList.add('hidden');
-            }
-
-            // Animate Card Entry
-            const card = document.getElementById('card-inner');
-            card.classList.remove('opacity-0', 'scale-95');
-            card.animate([
-                { opacity: 0, transform: 'scale(0.95)' },
-                { opacity: 1, transform: 'scale(1)' }
-            ], { duration: 300, easing: 'ease-out' });
+        function dokunmaBasladi(e) {
+            dokunmaBaslangicX = e.changedTouches[0].screenX;
         }
 
-        function nextContent() {
-            const dataList = contentData[currentTab];
-            // Random index that isn't the current one (if possible)
-            let newIdx;
-            if(dataList.length > 1) {
-                do {
-                    newIdx = Math.floor(Math.random() * dataList.length);
-                } while(newIdx === currentIndex[currentTab]);
-            } else {
-                newIdx = 0;
-            }
-            
-            currentIndex[currentTab] = newIdx;
-            
-            // Trigger animation
-            const card = document.getElementById('content-card');
-            card.classList.add('opacity-50', 'scale-95');
-            
-            setTimeout(() => {
-                renderCard();
-                card.classList.remove('opacity-50', 'scale-95');
-            }, 150);
+        function dokunmaBitti(e) {
+            dokunmaBitisX = e.changedTouches[0].screenX;
+            kaydirmaHesapla();
         }
 
-        function switchTab(tabName) {
-            if(tabName === currentTab) return;
+        function kaydirmaHesapla() {
+            const fark = dokunmaBaslangicX - dokunmaBitisX;
+            const esik = 50; // Hassasiyet
 
-            // Simple transition effect
-            transitionOverlay.classList.remove('opacity-0');
-            
-            setTimeout(() => {
-                currentTab = tabName;
-                updateUI();
-                transitionOverlay.classList.add('opacity-0');
-            }, 150);
-        }
-
-        function shareContent() {
-            const item = contentData[currentTab][currentIndex[currentTab]];
-            const textToShare = `${item.title}\n\n"${item.body}"\n\n${item.source}\n- Gönül Defteri Uygulaması`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Gönül Defteri',
-                    text: textToShare,
-                }).catch((error) => console.log('Paylaşım iptal', error));
-            } else {
-                // Fallback: Copy to clipboard
-                navigator.clipboard.writeText(textToShare).then(() => {
-                    alert('Söz kopyalandı!');
-                });
+            if (Math.abs(fark) > esik) {
+                const mevcutIndex = sekmeler.findIndex(s => s.id === aktifSekme);
+                if (fark > 0) {
+                    // Sola kaydırdı (İleri git)
+                    if (mevcutIndex < sekmeler.length - 1) sekmeDegistir(sekmeler[mevcutIndex + 1].id);
+                } else {
+                    // Sağa kaydırdı (Geri git)
+                    if (mevcutIndex > 0) sekmeDegistir(sekmeler[mevcutIndex - 1].id);
+                }
             }
         }
 
-        // --- SWIPE LOGIC ---
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const minSwipeDistance = 50;
-
-        mainContainer.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-
-        mainContainer.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-
-        function handleSwipe() {
-            const tabs = ['esma', 'ayet', 'hadis', 'beyit'];
-            const currentIdx = tabs.indexOf(currentTab);
-            
-            if (touchEndX < touchStartX - minSwipeDistance) {
-                // Swiped Left -> Next Tab
-                const nextIdx = (currentIdx + 1) % tabs.length;
-                switchTab(tabs[nextIdx]);
-            }
-            
-            if (touchEndX > touchStartX + minSwipeDistance) {
-                // Swiped Right -> Prev Tab
-                const prevIdx = (currentIdx - 1 + tabs.length) % tabs.length;
-                switchTab(tabs[prevIdx]);
-            }
+        // Zikirmatik Fonksiyonları
+        function zikirmatikAc() {
+            const modal = document.getElementById('zikirmatik-modal');
+            modal.classList.remove('hidden');
+            // Timeout animasyonun çalışması için gerekli
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
 
-        // --- INIT ---
-        // Randomize initial content
-        Object.keys(currentIndex).forEach(key => {
-            currentIndex[key] = Math.floor(Math.random() * contentData[key].length);
-        });
-        updateUI();
+        function zikirmatikKapat() {
+            const modal = document.getElementById('zikirmatik-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
 
+        function zikirCek() {
+            zikirSayisi++;
+            document.getElementById('zikir-sayisi').innerText = zikirSayisi;
+            localStorage.setItem('zikirSayisi', zikirSayisi);
+            
+            // Titreşim (Mobil cihazlarda)
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+
+        function zikirSifirla() {
+            if(confirm("Tesbihatı sıfırlamak ister misin derviş kardeşim?")) {
+                zikirSayisi = 0;
+                document.getElementById('zikir-sayisi').innerText = zikirSayisi;
+                localStorage.setItem('zikirSayisi', 0);
+            }
+        }
     </script>
 </body>
 </html>
